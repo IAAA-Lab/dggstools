@@ -1,3 +1,4 @@
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -23,31 +24,37 @@ from dggstools.rhpx.utils.storage import geodataframe_to_geopackage, get_gpkg_rh
 # expected is pending work.
 class DataTestsSpec(unittest.TestCase):
 
-    def setUp(self):
-        try:
-            data_dir = os.environ['GEO2DGGS_TEST_DATA_DIR']
-            self.data_dir = data_dir
-        except KeyError:
-            if os.path.exists("../test_data"):
-                self.data_dir = Path("../test_data")
-            elif os.path.exists("test_data"):
-                self.data_dir = Path("test_data")
-            elif os.path.exists("tests/test_data"):
-                self.data_dir = Path("tests/test_data")
-        self.temp_dir = tempfile.mkdtemp()
-        self.output_dir = self.temp_dir
-        self.rdggs = rhp.RHEALPixDGGS(ellipsoid=WGS84_ELLIPSOID, north_square=1, south_square=0, N_side=3)
-        self.rdggs_helper = RHEALPixDGGSHelper(self.rdggs)
-        self.logger = logging.getLogger("geo2dggs")
-        self.rdggs_df_helper = RHEALPixDataFrameHelper(self.rdggs)
-
-        self.engine = create_engine("sqlite://", echo=True, future=True)
+    # This runs once for the whole class
+    @classmethod
+    def setUpClass(cls):
+        cls.rdggs = rhp.RHEALPixDGGS(ellipsoid=WGS84_ELLIPSOID, north_square=1, south_square=0, N_side=3)
+        cls.rdggs_helper = RHEALPixDGGSHelper(cls.rdggs)
+        cls.logger = logging.getLogger("geo2dggs")
+        cls.rdggs_df_helper = RHEALPixDataFrameHelper(cls.rdggs)
+        cls.engine = create_engine("sqlite://", echo=True, future=True)
 
         # If I wanted to not see, say, rasterio logs:
         # logging.getLogger('rasterio').propagate = False
-
         # Configuration for the logs (including those of every library used that produces logs)
         logging.basicConfig(format="[%(filename)s:%(lineno)s - %(funcName)20s()] %(message)s", level=logging.INFO)
+
+        cwd = os.getcwd()
+        try:
+            data_dir = os.environ['GEO2DGGS_TEST_DATA_DIR']
+            cls.data_dir = data_dir
+        except KeyError:
+            if os.path.exists("../test_data"):
+                cls.data_dir = Path("../test_data")
+            elif os.path.exists("test_data"):
+                cls.data_dir = Path("test_data")
+            elif os.path.exists("tests/test_data"):
+                cls.data_dir = Path("tests/test_data")
+        os.chdir(cwd)
+        cls.temp_dir = tempfile.mkdtemp()
+        shutil.copytree(cls.data_dir, cls.temp_dir, dirs_exist_ok=True)
+        cls.data_dir = Path(cls.temp_dir)
+        cls.output_dir = cls.temp_dir
+        os.chdir(cls.temp_dir)
 
     def log_some_info(self, input_file_path, dst_resolution_idx):
         with rasterio.open(input_file_path) as raster:
