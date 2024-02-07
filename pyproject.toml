@@ -6,6 +6,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dggstools"
 version = "0.1.0"
+dynamic = ["dependencies"]
 
 [project.scripts]
 git4grids = "dggstools.__main__:app"
+
+[tool.setuptools]
+packages = ["dggstools", "dggstools.auids", "dggstools.rhpx", "dggstools.rhpx.utils"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
