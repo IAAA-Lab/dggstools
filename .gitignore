@@ -207,5 +207,8 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
+# I really don't want anything .idea related
+.idea
+
 # System files and directories
 .directory

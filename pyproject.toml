@@ -1,0 +1,11 @@
+requires = [
+    "setuptools"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dggstools"
+version = "0.1.0"
+
+[project.scripts]
+git4grids = "dggstools.__main__:app"
