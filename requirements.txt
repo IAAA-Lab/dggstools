@@ -14,7 +14,7 @@ GeoAlchemy2==0.12.5
 geopandas==0.14.0
 jmespath==1.0.0
 kiwisolver==1.4.2
-matplotlib==3.5.1
+matplotlib==3.7.2
 munch==2.5.0
 networkx==2.8.7
 numpy==1.26.4
