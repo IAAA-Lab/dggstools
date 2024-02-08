@@ -136,6 +136,7 @@ def print_vec_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
 
 # TODO: Other possible commands
 
+# DGGSTOOLS GEOPACKAGE BACK TO RASTER VERSION. THIS IS NECESSARY
 # def vector_to_rhpx_vector() # THIS IS JUSTA A BASIC VECTOR REPROJECTION, BUT A WRAPPER HERE WOULD SEEM OK
 # def get_raster_rhpx_metadata(): THIS IS NOT YET IMPLEMENTED. NOT TRIVIAL, BUT NOT DIFFICULT. IT SHOULD PRODUCE THE SAME
 # METADATA AS THE GEOPACKAGE COMMAND
