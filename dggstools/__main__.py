@@ -1,5 +1,6 @@
 from typing import Annotated, Optional
 
+import geopandas
 import rasterio
 import typer
 
@@ -122,6 +123,18 @@ def ras_rhpx_to_vec(input_file_path: Annotated[str, typer.Argument()],
     except Exception as e:
         result = str(e)
     print(result)
+
+# @app.command()
+# def vec_rhpx_to_ras_rhpx(input_file_path: Annotated[str, typer.Argument()],
+#                         output_file_path: Annotated[str, typer.Argument()],
+#                     geo_id_column_name: Annotated[str, typer.Option()] = "cellid",
+#                     layer_name: Annotated[str, typer.Option()] = "data",
+#                     add_uid: Annotated[bool, typer.Option()] = False,
+#                     values_in_json: Annotated[bool, typer.Option()] = False,
+#                     store_nodata: Annotated[bool, typer.Option()] = False,
+#                     rdggs: Annotated[str, typer.Option()] = "3/1/0"):
+#
+#     See the code in test_raster_to_gpkg_and_back(). Part of it could be packaged somewhere else.
 
 @app.command()
 def print_vec_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):

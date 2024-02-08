@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import geopandas
 import rasterio.enums
 import rhealpixdggs.dggs as rhp
 import time
@@ -665,6 +666,30 @@ class DataTestsSpec(unittest.TestCase):
             self.assertTrue(raster.height == 10 or raster.height == 9)
             self.assertEqual(raster.height, 10) #
             self.assertEqual(raster.count, 1)
+
+    def test_raster_to_gpkg_and_back(self):
+        # Reproject a raster to rhpx so we have something to work with
+        _ = raster_to_rhealpix(self.rdggs,  os.path.join(self.data_dir, "landsat_image_small.tif"),
+                               os.path.join(self.temp_dir, "landsat_image_small_rhpx_321.tif"),
+                               dst_resolution_idx=9)
+
+        # The real test starts now
+        # Load the raster into a geodataframe
+        gdf = RHEALPixDataFrameHelper(self.rdggs).rhealpix_file_to_geodataframe(
+            os.path.join(self.data_dir, "landsat_image_small_rhpx_321.tif"))
+        # Save the geodataframe to a geopackage
+        geodataframe_to_geopackage(gdf, os.path.join(self.temp_dir, "landsat_image_small_tif_321.gpkg"))
+
+        # Load the geopackage into a geodataframe
+        gdf2 = geopandas.read_file(os.path.join(self.temp_dir, "landsat_image_small_tif_321.gpkg"), engine="pyogrio")
+        # Add the attrs (metadata) to the geodataframe
+        rhpx_metadata = get_gpkg_rhpx_metadata(os.path.join(self.temp_dir, "landsat_image_small_tif_321.gpkg"))
+        gdf2.attrs.update(rhpx_metadata)
+        # Save the geodataframe to a rhealpix raster file. This should be equivalent to the first rhpx raster
+        RHEALPixDataFrameHelper(self.rdggs).geodataframe_to_rhealpix_file(gdf2,
+                                                                          os.path.join(self.temp_dir, "landsat_image_small_gpkg_321.tif"),
+                                                                          metadata_dict=rhpx_metadata)
+        
 
 
 if __name__ == '__main__':
