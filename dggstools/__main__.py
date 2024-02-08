@@ -29,15 +29,15 @@ def _parse_rdggs(rdggs_str: str) -> RHEALPixDGGS:
 
 
 @app.command()
-def vector_to_rhpx_raster(input_file_path: Annotated[str, typer.Argument()],
-                          output_file_path: Annotated[str, typer.Argument()],
-                          dst_resolution_idx: Annotated[int, typer.Argument()],
-                          property_for_class: Annotated[Optional[str], typer.Argument()] = None,
-                          fixed_value: Annotated[int, typer.Option()] = 1,
-                          input_crs: Annotated[Optional[str], typer.Option()] = None,
-                          layer: Annotated[Optional[str], typer.Option()] = None,
-                          all_touched: Annotated[bool, typer.Option()] = False,
-                          rdggs: Annotated[str, typer.Option()] = "3/1/0"):
+def vec_to_rhpx_ras(input_file_path: Annotated[str, typer.Argument()],
+                    output_file_path: Annotated[str, typer.Argument()],
+                    dst_resolution_idx: Annotated[int, typer.Argument()],
+                    property_for_class: Annotated[Optional[str], typer.Argument()] = None,
+                    fixed_value: Annotated[int, typer.Option()] = 1,
+                    input_crs: Annotated[Optional[str], typer.Option()] = None,
+                    layer: Annotated[Optional[str], typer.Option()] = None,
+                    all_touched: Annotated[bool, typer.Option()] = False,
+                    rdggs: Annotated[str, typer.Option()] = "3/1/0"):
     # layer is Union[str, int] but typer does not support Union
     # I will have to parse it manually
 
@@ -53,13 +53,13 @@ def vector_to_rhpx_raster(input_file_path: Annotated[str, typer.Argument()],
     print(result)
 
 @app.command()
-def vector_raster_area_error(vector_file_path: Annotated[str, typer.Argument()],
-                             raster_file_path: Annotated[str, typer.Argument()],
-                             property_for_class: Annotated[Optional[str], typer.Argument()] = None,
-                             fixed_value: Annotated[int, typer.Option()] = 1,
-                             input_crs: Annotated[Optional[str], typer.Option()] = None,
-                             band: Annotated[int, typer.Option()] = 1,
-                             layer: Annotated[Optional[str], typer.Option()] = None):
+def vec_ras_area_error(vector_file_path: Annotated[str, typer.Argument()],
+                       raster_file_path: Annotated[str, typer.Argument()],
+                       property_for_class: Annotated[Optional[str], typer.Argument()] = None,
+                       fixed_value: Annotated[int, typer.Option()] = 1,
+                       input_crs: Annotated[Optional[str], typer.Option()] = None,
+                       band: Annotated[int, typer.Option()] = 1,
+                       layer: Annotated[Optional[str], typer.Option()] = None):
     # layer is Union[str, int] but typer does not support Union
     # I will have to parse it manually
 
@@ -78,17 +78,17 @@ def vector_raster_area_error(vector_file_path: Annotated[str, typer.Argument()],
 
 
 @app.command()
-def raster_to_rhpx_raster(input_file_path: Annotated[str, typer.Argument()],
-                          output_file_path: Annotated[str, typer.Argument()],
-                          dst_resolution_idx: Annotated[int, typer.Argument()],
-                          rescaling_strategy: Annotated[
+def ras_to_rhpx_ras(input_file_path: Annotated[str, typer.Argument()],
+                    output_file_path: Annotated[str, typer.Argument()],
+                    dst_resolution_idx: Annotated[int, typer.Argument()],
+                    rescaling_strategy: Annotated[
                               RescalingStrategy, typer.Option()] = RescalingStrategy.TO_CLOSEST.value,
-                          input_crs: Annotated[Optional[str], typer.Option()] = None,
-                          resampling: Annotated[
+                    input_crs: Annotated[Optional[str], typer.Option()] = None,
+                    resampling: Annotated[
                               rasterio.enums.Resampling, typer.Option()] = rasterio.enums.Resampling.nearest.value,
-                          src_nodata: Annotated[Optional[int], typer.Option()] = None,
-                          dst_nodata: Annotated[Optional[int], typer.Option()] = None,
-                          rdggs: Annotated[str, typer.Option()] = "3/1/0"):
+                    src_nodata: Annotated[Optional[int], typer.Option()] = None,
+                    dst_nodata: Annotated[Optional[int], typer.Option()] = None,
+                    rdggs: Annotated[str, typer.Option()] = "3/1/0"):
 
     # src_nodata and dst_nodata should be int | float, but typer does not support Union
 
@@ -105,14 +105,14 @@ def raster_to_rhpx_raster(input_file_path: Annotated[str, typer.Argument()],
     print(result)
 
 @app.command()
-def raster_rhpx_to_geopackage(input_file_path: Annotated[str, typer.Argument()],
-                              output_file_path: Annotated[str, typer.Argument()],
-                              geo_id_column_name: Annotated[str, typer.Option()] = "cellid",
-                              layer_name: Annotated[str, typer.Option()] = "data",
-                              add_uid: Annotated[bool, typer.Option()] = False,
-                              values_in_json: Annotated[bool, typer.Option()] = False,
-                              store_nodata: Annotated[bool, typer.Option()] = False,
-                              rdggs: Annotated[str, typer.Option()] = "3/1/0"):
+def ras_rhpx_to_vec(input_file_path: Annotated[str, typer.Argument()],
+                    output_file_path: Annotated[str, typer.Argument()],
+                    geo_id_column_name: Annotated[str, typer.Option()] = "cellid",
+                    layer_name: Annotated[str, typer.Option()] = "data",
+                    add_uid: Annotated[bool, typer.Option()] = False,
+                    values_in_json: Annotated[bool, typer.Option()] = False,
+                    store_nodata: Annotated[bool, typer.Option()] = False,
+                    rdggs: Annotated[str, typer.Option()] = "3/1/0"):
     try:
         gdf = RHEALPixDataFrameHelper(_parse_rdggs(rdggs)).rhealpix_file_to_geodataframe(input_file_path,
                                                                                          geo_id_column_name, add_uid,
@@ -124,7 +124,7 @@ def raster_rhpx_to_geopackage(input_file_path: Annotated[str, typer.Argument()],
     print(result)
 
 @app.command()
-def print_gpkg_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
+def print_vec_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
     try:
         metadata = get_gpkg_rhpx_metadata(input_file_path)
         result = str(metadata) + "\nOK"

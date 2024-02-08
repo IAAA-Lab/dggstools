@@ -31,7 +31,8 @@ class RhpxScriptTestsSpec(unittest.TestCase):
     logging.basicConfig(format="[%(filename)s:%(lineno)s - %(funcName)20s()] %(message)s", level=logging.INFO)
 
     test_datasets= ["Aragón_ETRS89_30N.shp", "Aragón_ETRS89_30N.dbf",
-                    "Aragón_ETRS89_30N.prj", "Aragón_ETRS89_30N.shx", "landsat_image_small.tif"]
+                    "Aragón_ETRS89_30N.prj", "Aragón_ETRS89_30N.shx",
+                    "landsat_image_small.tif", "NYC_Noise_Part_UTM_18N_WGS84.gpkg"]
 
     def setUp(self):
         os.chdir(self.cwd)
@@ -46,14 +47,15 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         return temp_dir
 
     def test_v_to_rhealpix(self):
-        result = self.runner.invoke(main.app, ["vector-to-rhpx-raster",
+        # Area dataset
+        result = self.runner.invoke(main.app, ["vec-to-rhpx-ras",
                                                "Aragón_ETRS89_30N.shp",
                                                "Aragón_ETRS89_30N.tif",
                                                "6"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
-        result = self.runner.invoke(main.app, ["vector-to-rhpx-raster",
+        result = self.runner.invoke(main.app, ["vec-to-rhpx-ras",
                                                "Aragón_ETRS89_30N.shp",
                                                "Aragón_ETRS89_30N_nside2.tif",
                                                "8",
@@ -61,15 +63,27 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
+        # Point dataset. It also works, but rasterizing points as this is not very useful
+        # Binning the points would be more useful (TODO)
+        result = self.runner.invoke(main.app, ["vec-to-rhpx-ras",
+                                               "NYC_Noise_Part_UTM_18N_WGS84.gpkg",
+                                               "NYC.tif",
+                                               "11"])
+        print (result.stdout)
+        assert result.exit_code == 0
+        assert "OK" in result.stdout
+
+
+
     def test_r_to_rhealpix(self):
-        result = self.runner.invoke(main.app, ["raster-to-rhpx-raster",
+        result = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
                                                "landsat_image_small.tif",
                                                "landsat_image_small-rHEALPIX.tif",
                                                "11"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
-        result = self.runner.invoke(main.app, ["raster-to-rhpx-raster",
+        result = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
                                                "landsat_image_small.tif",
                                                "landsat_image_small-rHEALPIX2.tif",
                                                "12",
@@ -80,12 +94,12 @@ class RhpxScriptTestsSpec(unittest.TestCase):
 
     def test_v_r_area_error(self):
         # First we create the raster
-        result = self.runner.invoke(main.app, ["vector-to-rhpx-raster",
+        result = self.runner.invoke(main.app, ["vec-to-rhpx-ras",
                                                "Aragón_ETRS89_30N.shp",
                                                "Aragón_ETRS89_30N_vrareaerr.tif",
                                                "10"])
 
-        result = self.runner.invoke(main.app, ["vector-raster-area-error",
+        result = self.runner.invoke(main.app, ["vec-ras-area-error",
                                                     "Aragón_ETRS89_30N.shp",
                                                     "Aragón_ETRS89_30N_vrareaerr.tif",
                                                     "--input-crs", "EPSG:25830"])
@@ -94,14 +108,14 @@ class RhpxScriptTestsSpec(unittest.TestCase):
 
     def test_rhealpix_to_gpkg(self):
         # We need first a rhealpix raster file
-        result = self.runner.invoke(main.app, ["raster-to-rhpx-raster",
+        result = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
                                                "landsat_image_small.tif",
                                                "landsat_image_small-rHEALPIX.tif",
                                                "11"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
-        result = self.runner.invoke(main.app, ["raster-rhpx-to-geopackage",
+        result = self.runner.invoke(main.app, ["ras-rhpx-to-vec",
                                                "landsat_image_small-rHEALPIX.tif",
                                                "landsat_image_small-rHEALPIX.gpkg"])
         assert result.exit_code == 0
@@ -109,21 +123,21 @@ class RhpxScriptTestsSpec(unittest.TestCase):
 
         # We can also test the print metadata command which also helps to validate
         # the previous result
-        result = self.runner.invoke(main.app, ["print-gpkg-rhpx-metadata",
+        result = self.runner.invoke(main.app, ["print-vec-rhpx-metadata",
                                                "landsat_image_small-rHEALPIX.gpkg"])
         assert result.exit_code == 0
         assert "'res_idx': 11" in result.stdout
         assert "OK" in result.stdout
 
 
-        result = self.runner.invoke(main.app, ["raster-rhpx-to-geopackage",
+        result = self.runner.invoke(main.app, ["ras-rhpx-to-vec",
                                                "landsat_image_small-rHEALPIX.tif",
                                                "landsat_image_small-rHEALPIX-221.gpkg",
                                                "--rdggs", "2/2/1"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
-        result = self.runner.invoke(main.app, ["print-gpkg-rhpx-metadata",
+        result = self.runner.invoke(main.app, ["print-vec-rhpx-metadata",
                                                "landsat_image_small-rHEALPIX-221.gpkg"])
         assert result.exit_code == 0
         assert "'north_square': 2" in result.stdout
