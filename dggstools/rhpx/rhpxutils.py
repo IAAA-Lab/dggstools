@@ -3,6 +3,7 @@ from typing import List, Tuple, Union
 
 import numpy as np
 import fiona.transform
+import rasterio
 import rasterio.crs
 import shapely.geometry
 import shapely.ops
@@ -10,7 +11,8 @@ from rasterio.transform import Affine
 
 from rhealpixdggs.dggs import RHEALPixDGGS, Cell
 from rhealpixdggs.ellipsoids import WGS84_A, WGS84_F, WGS84_ELLIPSOID
-from .utils.rasterutils import *
+from dggstools.rhpx.utils.rasterutils import *
+from rasterutils import get_raster_profile, get_bbox_from_raster_profile
 
 # ROBERT GIBB, ALEXANDER RAICHEV, AND MICHAEL SPETH. THE RHEALPIX DISCRETE GLOBAL GRID SYSTEM (2013)
 RHEALPIX_MEAN_AREAL_DISTORTION = 1.178  # Min, max and median (which actually is 1.177) are equal to the mean, as
@@ -25,11 +27,23 @@ def rdggs_to_namedtuple(rdggs: RHEALPixDGGS) -> RHEALPixDGGSNamedTuple:
     return RHEALPixDGGSNamedTuple("WGS84", rdggs.N_side, rdggs.north_square,
                                   rdggs.south_square)
 
-
 def namedtuple_to_rdggs(rdggs_namedtuple: RHEALPixDGGSNamedTuple) -> RHEALPixDGGS:
     assert rdggs_namedtuple.ellipsoid == "WGS84", "Only the WGS84 Ellipsoid can be used for now"
     return RHEALPixDGGS(ellipsoid=WGS84_ELLIPSOID, N_side=rdggs_namedtuple.n_side,
                         north_square=rdggs_namedtuple.north_square, south_square=rdggs_namedtuple.south_square)
+
+
+def pyproj_crs_to_rdggs(crs: pyproj.CRS, N_side: int) -> RHEALPixDGGS:
+    # n_side is not part of the rHEALPix projection, but it is part of the rHEALPIX DGGS. Here it must be a parameter
+    crs_dict = crs.to_dict()
+    assert crs_dict["proj"] == "rhealpix", "crs must be rHEALPix"
+    assert crs.ellipsoid.name == "WGS 84" or crs.ellipsoid.name == "WGS84" or crs.ellipsoid.name == "WGS_84", \
+        "Only the WGS84 Ellipsoid is supported"
+    assert N_side == 2 or N_side == 3, f"N_side must be 2 or 3 but it is {N_side}"
+
+    return RHEALPixDGGS(ellipsoid=WGS84_ELLIPSOID, N_side=N_side, north_square=crs_dict["north_square"],
+                        south_square=crs_dict["south_square"])
+
 
 def cellidstr_to_suid(cellid: str) -> List:
     return list(cellid[0]) + [int(digit) for digit in cellid[1:]]
@@ -93,6 +107,48 @@ def get_descendant_cellids_up_to_resolution_idx(cellid: str, rhpx: RHEALPixDGGS,
         result.extend(get_descendant_cellids_at_resolution_idx(cellid, rhpx, i))
     return result
 
+def get_gdf_attrs_from_rhealpix_file(input_file_path: str) -> dict:
+    result = {}
+    profile = get_raster_profile(input_file_path)
+
+    with rasterio.open(input_file_path) as raster:
+        n_side = int(raster.tags()["n_side"])
+        rdggs = pyproj_crs_to_rdggs(pyproj.CRS(profile["crs"]), n_side)
+        rdggs_helper = RHEALPixDGGSHelper(rdggs)
+
+        result["left"], result["top"], result["right"], result["bottom"], resx, resy = (
+            get_bbox_from_raster_profile(profile))
+        resolution_idx_x, _ = rdggs_helper.get_closest_resolution(abs(resx))
+        resolution_idx_y, _ = rdggs_helper.get_closest_resolution(abs(resy))  # resy is often a negative number
+        assert resolution_idx_x == resolution_idx_y, \
+            f"{input_file_path} is not a proper rhealpix file. Its cells are not squares."
+
+        result["resolution_idx"] = resolution_idx_x
+        result["res"] = resx
+
+        result["rhealpixdggs"] = {"n_side": rdggs.N_side,
+                                  "north_square": rdggs.north_square,
+                                  "south_square": rdggs.south_square,
+                                  "max_areal_resolution": rdggs.max_areal_resolution,
+                                  "max_resolution": rdggs.max_resolution,
+                                  "ellipsoid": rdggs.ellipsoid}
+
+        result["height"] = raster.height
+        result["width"] = raster.width
+        result["nbands"] = raster.count
+        result["nodata"] = raster.nodata
+        result["nodatavals"] = raster.nodatavals
+        result["dtypes"] = raster.dtypes
+
+    return result
+
+
+def gdf_attrs_to_rdggs(gdf_attrs: dict) -> RHEALPixDGGS:
+    return RHEALPixDGGS(ellipsoid=WGS84_ELLIPSOID,
+                        N_side=gdf_attrs["rhealpixdggs"]["n_side"],
+                        north_square=gdf_attrs["rhealpixdggs"]["north_square"],
+                        south_square=gdf_attrs["rhealpixdggs"]["south_square"])
+
 
 class RHEALPixDGGSHelper:
 
@@ -132,6 +188,7 @@ class RHEALPixDGGSHelper:
 
     def rhealpixdef_to_pyproj_crs(self) -> pyproj.CRS:
         return pyproj.CRS(self.rhealpixdef_to_proj_string())
+
 
     def cell_widths_for_all_resolutions(self) -> List[float]:
         return [self.rdggs.cell_width(i) for i in range(self.rdggs.max_resolution)]

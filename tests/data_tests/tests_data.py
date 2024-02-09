@@ -16,7 +16,8 @@ from dggstools.rhpx.rhpxdataframes import *
 from dggstools.rhpx.vector_to_rhpx import _vector_to_optimal_set_of_cuids
 from dggstools.rhpx.vector_to_rhpx import *
 from dggstools.rhpx.utils import utils
-from dggstools.rhpx.utils.storage import geodataframe_to_geopackage, get_gpkg_rhpx_metadata
+from dggstools.rhpx.utils.storage import geodataframe_to_geopackage, get_gpkg_rhpx_metadata, rhealpix_to_geopackage, \
+    geopackage_to_rhealpix
 
 
 # TODO: Many tests here are essentially smoke tests and the results produced by them must be checked manually if you
@@ -424,7 +425,7 @@ class DataTestsSpec(unittest.TestCase):
         rhealpixdggs.pj_healpix.in_healpix_image = good_in_healpix_image
         rhealpixdggs.pj_rhealpix.in_rhealpix_image = good_in_rhealpix_image
 
-    def test_auid_gereration_for_shape(self):
+    def test_auid_generation_for_shape(self):
         input_file_name = "Aragón_ETRS89_30N.shp"
         input_crs = None
         dst_resolution_idx = 6
@@ -673,23 +674,16 @@ class DataTestsSpec(unittest.TestCase):
                                os.path.join(self.temp_dir, "landsat_image_small_rhpx_321.tif"),
                                dst_resolution_idx=9)
 
-        # The real test starts now
-        # Load the raster into a geodataframe
-        gdf = RHEALPixDataFrameHelper(self.rdggs).rhealpix_file_to_geodataframe(
-            os.path.join(self.data_dir, "landsat_image_small_rhpx_321.tif"))
-        # Save the geodataframe to a geopackage
-        geodataframe_to_geopackage(gdf, os.path.join(self.temp_dir, "landsat_image_small_tif_321.gpkg"))
+        rhealpix_to_geopackage(os.path.join(self.temp_dir, "landsat_image_small_rhpx_321.tif"),
+                               os.path.join(self.temp_dir, "landsat_image_small_tif_321.gpkg"))
 
-        # Load the geopackage into a geodataframe
-        gdf2 = geopandas.read_file(os.path.join(self.temp_dir, "landsat_image_small_tif_321.gpkg"), engine="pyogrio")
-        # Add the attrs (metadata) to the geodataframe
-        rhpx_metadata = get_gpkg_rhpx_metadata(os.path.join(self.temp_dir, "landsat_image_small_tif_321.gpkg"))
-        gdf2.attrs.update(rhpx_metadata)
-        # Save the geodataframe to a rhealpix raster file. This should be equivalent to the first rhpx raster
-        RHEALPixDataFrameHelper(self.rdggs).geodataframe_to_rhealpix_file(gdf2,
-                                                                          os.path.join(self.temp_dir, "landsat_image_small_gpkg_321.tif"),
-                                                                          metadata_dict=rhpx_metadata)
-        
+        geopackage_to_rhealpix(os.path.join(self.temp_dir, "landsat_image_small_tif_321.gpkg"),
+                               os.path.join(self.temp_dir, "landsat_image_small_gpkg_321.tif"))
+
+        # At this point landsat_image_small_rhpx_321.tif and landsat_image_small_gpkg_321.tif should be equivalent
+        # save from minor details (e.g. compression scheme in the GeoTIFF). TODO: TEST THIS, for now this have
+        # been manually verified, but it should be automated.
+
 
 
 if __name__ == '__main__':

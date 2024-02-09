@@ -5,6 +5,7 @@ import dggstools.rhpx.utils.utils as utils
 import rhealpixdggs.dggs as rhp
 
 
+
 class DGGSToolsTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -173,6 +174,19 @@ class DGGSToolsTestCase(unittest.TestCase):
         self.assertEqual(["N", "N1", "N12", "N123", "N1231"], rhpxutils.get_ascendant_cellids_up_to_resolution_idx("N12313", 0))
         self.assertEqual(["N12", "N123", "N1231"],
                          rhpxutils.get_ascendant_cellids_up_to_resolution_idx("N12313", 2))
+
+    def test_crs_to_rdggs(self):
+        dggs = rhp.RHEALPixDGGS(ellipsoid=rhp.WGS84_ELLIPSOID, north_square=2, south_square=1, N_side=2)
+        rdggs_helper = rhpxutils.RHEALPixDGGSHelper(dggs)
+        rdggs_crs = rdggs_helper.rhealpixdef_to_pyproj_crs()
+        dggs2 = rhpxutils.pyproj_crs_to_rdggs(rdggs_crs, 2)
+
+        self.assertEqual(dggs.ellipsoid, dggs2.ellipsoid)
+        self.assertEqual(dggs.south_square, dggs2.south_square)
+        self.assertEqual(dggs.north_square, dggs2.north_square)
+        self.assertEqual(dggs.N_side, dggs2.N_side)
+
+
 
 
 if __name__ == '__main__':

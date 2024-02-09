@@ -448,25 +448,3 @@ class RHEALPixDataFrameHelper:
                                      dtypes=[dtype])
         return gdf
 
-    def get_gdf_attrs_from_rhealpix_file(self, input_file_path: str) -> dict:
-        result = {}
-        profile = get_raster_profile(input_file_path)
-        result["left"], result["top"], result["right"], result["bottom"], resx, resy = (
-            get_bbox_from_raster_profile(profile))
-        resolution_idx_x, _ = self.rdggs_helper.get_closest_resolution(abs(resx))
-        resolution_idx_y, _ = self.rdggs_helper.get_closest_resolution(abs(resy))  # resy is often a negative number
-        assert resolution_idx_x == resolution_idx_y, \
-            f"{input_file_path} is not a proper rhealpix file. Its cells are not squares."
-
-        result["resolution_idx"] = resolution_idx_x
-        result["res"] = resx
-        with rasterio.open(input_file_path) as raster:
-            result["height"] = raster.height
-            result["width"] = raster.width
-            result["nbands"] = raster.count
-            result["nodata"] = raster.nodata
-            result["nodatavals"] = raster.nodatavals
-            result["dtypes"] = raster.dtypes
-
-        return result
-

@@ -10,7 +10,8 @@ from rhealpixdggs.ellipsoids import WGS84_ELLIPSOID
 from dggstools.rhpx.vector_to_rhpx import vector_to_rhealpix, calculate_vector_raster_area_error
 from dggstools.rhpx.raster_to_rhpx import raster_to_rhealpix, RescalingStrategy
 from dggstools.rhpx.rhpxdataframes import RHEALPixDataFrameHelper
-from dggstools.rhpx.utils.storage import geodataframe_to_geopackage, get_gpkg_rhpx_metadata
+from dggstools.rhpx.utils.storage import geodataframe_to_geopackage, get_gpkg_rhpx_metadata, rhealpix_to_geopackage, \
+    geopackage_to_rhealpix
 
 app = typer.Typer()
 
@@ -106,35 +107,33 @@ def ras_to_rhpx_ras(input_file_path: Annotated[str, typer.Argument()],
     print(result)
 
 @app.command()
-def ras_rhpx_to_vec(input_file_path: Annotated[str, typer.Argument()],
-                    output_file_path: Annotated[str, typer.Argument()],
-                    geo_id_column_name: Annotated[str, typer.Option()] = "cellid",
-                    layer_name: Annotated[str, typer.Option()] = "data",
-                    add_uid: Annotated[bool, typer.Option()] = False,
-                    values_in_json: Annotated[bool, typer.Option()] = False,
-                    store_nodata: Annotated[bool, typer.Option()] = False,
-                    rdggs: Annotated[str, typer.Option()] = "3/1/0"):
+def ras_rhpx_to_vec_rhpx(input_file_path: Annotated[str, typer.Argument()],
+                         output_file_path: Annotated[str, typer.Argument()],
+                         geo_id_column_name: Annotated[str, typer.Option()] = "cellid",
+                         layer_name: Annotated[str, typer.Option()] = "data",
+                         add_uid: Annotated[bool, typer.Option()] = False,
+                         values_in_json: Annotated[bool, typer.Option()] = False,
+                         store_nodata: Annotated[bool, typer.Option()] = False):
     try:
-        gdf = RHEALPixDataFrameHelper(_parse_rdggs(rdggs)).rhealpix_file_to_geodataframe(input_file_path,
-                                                                                         geo_id_column_name, add_uid,
-                                                                                         values_in_json, store_nodata)
-        geodataframe_to_geopackage(gdf, output_file_path, layer_name)
+        rhealpix_to_geopackage(input_file_path,
+                               output_file_path, geo_id_column_name, layer_name, add_uid, values_in_json, store_nodata)
         result = "OK"
     except Exception as e:
         result = str(e)
     print(result)
 
-# @app.command()
-# def vec_rhpx_to_ras_rhpx(input_file_path: Annotated[str, typer.Argument()],
-#                         output_file_path: Annotated[str, typer.Argument()],
-#                     geo_id_column_name: Annotated[str, typer.Option()] = "cellid",
-#                     layer_name: Annotated[str, typer.Option()] = "data",
-#                     add_uid: Annotated[bool, typer.Option()] = False,
-#                     values_in_json: Annotated[bool, typer.Option()] = False,
-#                     store_nodata: Annotated[bool, typer.Option()] = False,
-#                     rdggs: Annotated[str, typer.Option()] = "3/1/0"):
-#
-#     See the code in test_raster_to_gpkg_and_back(). Part of it could be packaged somewhere else.
+@app.command()
+def vec_rhpx_to_ras_rhpx(input_file_path: Annotated[str, typer.Argument()],
+                         output_file_path: Annotated[str, typer.Argument()],
+                         nodata: Annotated[float, typer.Option()] = 0):
+    # TODO: nodata can be int or float, but typer does not support Union types
+    try:
+        geopackage_to_rhealpix(input_file_path, output_file_path, nodata)
+        result = "OK"
+    except Exception as e:
+        result = str(e)
+    print(result)
+
 
 @app.command()
 def print_vec_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
@@ -151,7 +150,7 @@ def print_vec_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
 
 # DGGSTOOLS GEOPACKAGE BACK TO RASTER VERSION. THIS IS NECESSARY
 # def vector_to_rhpx_vector() # THIS IS JUSTA A BASIC VECTOR REPROJECTION, BUT A WRAPPER HERE WOULD SEEM OK
-# def get_raster_rhpx_metadata(): THIS IS NOT YET IMPLEMENTED. NOT TRIVIAL, BUT NOT DIFFICULT. IT SHOULD PRODUCE THE SAME
+# def get_raster_rhpx_metadata(): THIS SHOULD PRODUCE THE SAME
 # METADATA AS THE GEOPACKAGE COMMAND
 # def vector_raster_line_error(): FAR LESS INTERESTING (AND TESTED) THAN THE AREA ERROR
 # def rhealpix_grid_as_geodataframe(): # THERE ARE OTHER TOOLS TO GENERATE DGGS GRIDS. BUT THE FUNCTIONALITY IS AVAILABLE

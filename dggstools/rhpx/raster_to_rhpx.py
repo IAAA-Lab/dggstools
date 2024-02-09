@@ -121,6 +121,7 @@ def _reproject_raster_to_rhealpix(rdggs: RHEALPixDGGS, input_file_path: str, out
                     dst_nodata=set_dst_nodata,
                     dst_crs=dst_crs,
                     resampling=resampling)
+            dst.update_tags(n_side=rdggs.N_side)
             # TOFIX: AREA_OR_POINT DOES NOT GET WRITTEN TO THE OUTPUT FILE. But I can write anything else
             # I haven't found a way to write this in dst.
             # TODO: Once I do, parameterize this function (and raster_to_rhealpix and maybe others) so the
@@ -133,8 +134,7 @@ def _reproject_raster_to_rhealpix(rdggs: RHEALPixDGGS, input_file_path: str, out
             # dst.update_tags(GTRasterTypeGeoKey=1)
             # I suppose that writing that metadta with gdal would be the solution, but I don't want to
             # use gdal until I have a good solution for deployment (e.g. a dockerfile)
-            # It could also be a bug in GDAL. The version I use (what comes with Ubuntu 20.04) is outdated
-            # and there seem to be some bugfixes related to these issues
+            # It could also be a bug in GDAL.
 
 
 

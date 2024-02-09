@@ -115,7 +115,7 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
-        result = self.runner.invoke(main.app, ["ras-rhpx-to-vec",
+        result = self.runner.invoke(main.app, ["ras-rhpx-to-vec-rhpx",
                                                "landsat_image_small-rHEALPIX.tif",
                                                "landsat_image_small-rHEALPIX.gpkg"])
         assert result.exit_code == 0
@@ -129,20 +129,18 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         assert "'res_idx': 11" in result.stdout
         assert "OK" in result.stdout
 
+    def test_gpkg_to_rhealpix(self):
+        # We need first a geopackage
+        _ = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
+                                               "landsat_image_small.tif",
+                                               "landsat_image_small-rHEALPIX-921.tif",
+                                               "11"])
+        _ = self.runner.invoke(main.app, ["ras-rhpx-to-vec-rhpx",
+                                               "landsat_image_small-rHEALPIX-921.tif",
+                                               "landsat_image_small-rHEALPIX-921.gpkg"])
 
-        result = self.runner.invoke(main.app, ["ras-rhpx-to-vec",
-                                               "landsat_image_small-rHEALPIX.tif",
-                                               "landsat_image_small-rHEALPIX-221.gpkg",
-                                               "--rdggs", "2/2/1"])
+        result = self.runner.invoke(main.app, ["vec-rhpx-to-ras-rhpx",
+                                               "landsat_image_small-rHEALPIX-921.gpkg",
+                                               "landsat_image_small-rHEALPIX-921_gpkg.tif"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
-
-        result = self.runner.invoke(main.app, ["print-vec-rhpx-metadata",
-                                               "landsat_image_small-rHEALPIX-221.gpkg"])
-        assert result.exit_code == 0
-        assert "'north_square': 2" in result.stdout
-        assert "'south_square': 1" in result.stdout
-        assert "OK" in result.stdout
-
-
-

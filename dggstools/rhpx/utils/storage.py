@@ -1,10 +1,17 @@
 import json
 import os
+
+import geopandas
+import pyproj
 import sqlalchemy
 import sqlite3
 
 from geopandas import GeoDataFrame
 from typing import List, Dict, Any
+
+import rhpxutils
+from dggstools.rhpx.rhpxdataframes import RHEALPixDataFrameHelper
+from rasterutils import get_raster_profile
 
 
 def geodataframe_to_postgis(gdf: GeoDataFrame, table_name: str, username: str, password: str, host: str, port:int,
@@ -59,6 +66,36 @@ def geodataframe_to_geopackage(gdf: GeoDataFrame, output_file_path: str, layer_n
                     [json.dumps(gdf.attrs)])
 
     con.close()
+
+
+def rhealpix_to_geopackage(input_file_path: str, output_file_path: str, geo_id_column_name: str = "cellid",
+                           layer_name: str ="data",
+                           add_uid: bool = False, values_in_json: bool = False, store_nodata: bool = False):
+    profile = get_raster_profile(input_file_path)
+    input_crs = profile["crs"]
+    attrs = rhpxutils.get_gdf_attrs_from_rhealpix_file(input_file_path)
+    input_dggs = rhpxutils.pyproj_crs_to_rdggs(pyproj.CRS(input_crs), int(attrs["rhealpixdggs"]["n_side"]))
+
+    # Load the rhealpix raster file into a geodataframe
+    gdf = RHEALPixDataFrameHelper(input_dggs).rhealpix_file_to_geodataframe(input_file_path, geo_id_column_name, add_uid,
+                                                                            values_in_json, store_nodata)
+    # # Save the geodataframe to a geopackage
+    geodataframe_to_geopackage(gdf, output_file_path, layer_name)
+
+
+def geopackage_to_rhealpix(input_file_path: str, output_file_path: str, nodata: int | float = 0):
+    gdf = geopandas.read_file(input_file_path, engine="pyogrio")
+    # # Add the attrs (metadata) to the geodataframe
+    rhpx_metadata = get_gpkg_rhpx_metadata(input_file_path)
+    gdf.attrs.update(rhpx_metadata)
+    rdggs = rhpxutils.gdf_attrs_to_rdggs(rhpx_metadata)
+
+    # Save the geodataframe to a rhealpix raster file
+    RHEALPixDataFrameHelper(rdggs).geodataframe_to_rhealpix_file(gdf,
+                                                                 output_file_path,
+                                                                 metadata_dict=rhpx_metadata,
+                                                                 nodata=nodata)
+
 
 def get_gpkg_rhpx_metadata(input_file_path: str) -> dict[str, Any]:
     """
