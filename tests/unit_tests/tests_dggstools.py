@@ -5,7 +5,6 @@ import dggstools.rhpx.utils.utils as utils
 import rhealpixdggs.dggs as rhp
 
 
-
 class DGGSToolsTestCase(unittest.TestCase):
 
     def setUp(self):

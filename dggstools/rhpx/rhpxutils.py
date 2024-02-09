@@ -1,9 +1,7 @@
 from collections import namedtuple
-from typing import List, Tuple, Union
+from typing import List
 
-import numpy as np
 import fiona.transform
-import rasterio
 import rasterio.crs
 import shapely.geometry
 import shapely.ops
@@ -12,7 +10,6 @@ from rasterio.transform import Affine
 from rhealpixdggs.dggs import RHEALPixDGGS, Cell
 from rhealpixdggs.ellipsoids import WGS84_A, WGS84_F, WGS84_ELLIPSOID
 from dggstools.rhpx.utils.rasterutils import *
-from rasterutils import get_raster_profile, get_bbox_from_raster_profile
 
 # ROBERT GIBB, ALEXANDER RAICHEV, AND MICHAEL SPETH. THE RHEALPIX DISCRETE GLOBAL GRID SYSTEM (2013)
 RHEALPIX_MEAN_AREAL_DISTORTION = 1.178  # Min, max and median (which actually is 1.177) are equal to the mean, as
