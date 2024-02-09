@@ -9,9 +9,9 @@ import sqlite3
 from geopandas import GeoDataFrame
 from typing import List, Dict, Any
 
-import rhpxutils
+import dggstools.rhpx.rhpxutils as rhpxutils
 from dggstools.rhpx.rhpxdataframes import RHEALPixDataFrameHelper
-from rasterutils import get_raster_profile
+from dggstools.rhpx.utils.rasterutils import get_raster_profile
 
 
 def geodataframe_to_postgis(gdf: GeoDataFrame, table_name: str, username: str, password: str, host: str, port:int,

@@ -312,8 +312,8 @@ class RHEALPixDataFrameHelper:
             raise ValueError(f"Unsupported dtype {dtype} for GeoTIFF files. "
                              f"See <https://gdal.org/drivers/raster/gtiff.html>.")
 
-        # Create an np array of the right shape filled with the nodata value
-        data_array = np.full((nbands, transform_height, transform_width), nodata, dtype=dtype)
+        # Create a numpy array of the right shape filled with the nodata value
+        data_array = numpy.full((nbands, transform_height, transform_width), nodata, dtype=dtype)
 
         for tuple in gdf.itertuples():
             point = getattr(tuple, "geometry")
