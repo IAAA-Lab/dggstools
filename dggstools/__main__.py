@@ -1,16 +1,15 @@
 from typing import Annotated, Optional
 
-import geopandas
 import rasterio
 import typer
 
 from rhealpixdggs.dggs import RHEALPixDGGS
 from rhealpixdggs.ellipsoids import WGS84_ELLIPSOID
 
+from dggstools.rhpx.rhpxutils import get_gdf_attrs_from_rhealpix_file
 from dggstools.rhpx.vector_to_rhpx import vector_to_rhealpix, calculate_vector_raster_area_error
 from dggstools.rhpx.raster_to_rhpx import raster_to_rhealpix, RescalingStrategy
-from dggstools.rhpx.rhpxdataframes import RHEALPixDataFrameHelper
-from dggstools.rhpx.utils.storage import geodataframe_to_geopackage, get_gpkg_rhpx_metadata, rhealpix_to_geopackage, \
+from dggstools.rhpx.utils.storage import  get_gpkg_rhpx_metadata, rhealpix_to_geopackage, \
     geopackage_to_rhealpix
 
 app = typer.Typer()
@@ -139,6 +138,15 @@ def vec_rhpx_to_ras_rhpx(input_file_path: Annotated[str, typer.Argument()],
 def print_vec_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
     try:
         metadata = get_gpkg_rhpx_metadata(input_file_path)
+        result = str(metadata) + "\nOK"
+    except Exception as e:
+        result = str(e)
+    print(result)
+
+@app.command()
+def print_ras_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
+    try:
+        metadata = get_gdf_attrs_from_rhealpix_file(input_file_path)
         result = str(metadata) + "\nOK"
     except Exception as e:
         result = str(e)

@@ -120,7 +120,7 @@ def get_gdf_attrs_from_rhealpix_file(input_file_path: str) -> dict:
         assert resolution_idx_x == resolution_idx_y, \
             f"{input_file_path} is not a proper rhealpix file. Its cells are not squares."
 
-        result["resolution_idx"] = resolution_idx_x
+        result["res_idx"] = resolution_idx_x
         result["res"] = resx
 
         result["rhealpixdggs"] = {"n_side": rdggs.N_side,

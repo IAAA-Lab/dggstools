@@ -115,6 +115,14 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
+        # We can also test the print metadata for raster rhpx command
+        result = self.runner.invoke(main.app, ["print-ras-rhpx-metadata",
+                                               "landsat_image_small-rHEALPIX.tif"])
+        assert result.exit_code == 0
+        assert "'res_idx': 11" in result.stdout
+        assert "'n_side': 3" in result.stdout
+        assert "OK" in result.stdout
+
         result = self.runner.invoke(main.app, ["ras-rhpx-to-vec-rhpx",
                                                "landsat_image_small-rHEALPIX.tif",
                                                "landsat_image_small-rHEALPIX.gpkg"])
@@ -127,6 +135,7 @@ class RhpxScriptTestsSpec(unittest.TestCase):
                                                "landsat_image_small-rHEALPIX.gpkg"])
         assert result.exit_code == 0
         assert "'res_idx': 11" in result.stdout
+        assert "'n_side': 3" in result.stdout
         assert "OK" in result.stdout
 
     def test_gpkg_to_rhealpix(self):
