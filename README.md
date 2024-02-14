@@ -1,5 +1,7 @@
 # dggstools
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10659071.svg)](https://doi.org/10.5281/zenodo.10659071)
+
 Tools to manipulate raster and vector GIS data in the spatial framework provided by a DGGS.
 
 **Requirements**
