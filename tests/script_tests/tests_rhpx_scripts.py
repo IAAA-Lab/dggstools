@@ -79,14 +79,14 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         result = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
                                                "landsat_image_small.tif",
                                                "landsat_image_small-rHEALPIX.tif",
-                                               "11"])
+                                               "12"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
         result = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
                                                "landsat_image_small.tif",
                                                "landsat_image_small-rHEALPIX2.tif",
-                                               "12",
+                                               "14",
                                                "--rdggs", "2/1/0"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
@@ -104,6 +104,7 @@ class RhpxScriptTestsSpec(unittest.TestCase):
                                                     "Aragón_ETRS89_30N_vrareaerr.tif",
                                                     "--input-crs", "EPSG:25830"])
         assert result.exit_code == 0
+        print(result.stdout)
         assert "RMSE: 690635" in result.stdout
 
     def test_rhealpix_to_gpkg(self):

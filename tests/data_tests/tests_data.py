@@ -3,7 +3,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import geopandas
 import rasterio.enums
 import rhealpixdggs.dggs as rhp
 import time
@@ -139,14 +138,17 @@ class DataTestsSpec(unittest.TestCase):
     # Tests for now are pretty naive. Unless there are some exceptions, they will pass
     def test_raster_datasets(self):
         datasets = [
+            # TODO: After reprojecting the nasadem file to rhealpix and showing in QGIS it has a weird behaviour:
+            # for example some rows seem to have smaller (less "tall") pixels than others. There might be some issues
+            # with QGIS visualization (visualization of rhealpix some times is tricky), but this needs to be checked.
             ("nasadem.tif", 9, None, None, rasterio.enums.Resampling.nearest),
             ("Spain-France.tif", 7, None, None, rasterio.enums.Resampling.nearest),
-            ("pnoa_2015_25830_0354_4_4.jpg", 7, rasterio.crs.CRS.from_epsg(25830), None, rasterio.enums.Resampling.nearest),
+            ("pnoa_2015_25830_0354_4_4.jpg", 7, rasterio.crs.CRS().from_epsg(25830), None, rasterio.enums.Resampling.nearest),
             ("NAIP_30.img", 7, None, None, rasterio.enums.Resampling.nearest),
             ("HYP_50M_SR_Robinson.tif", 7, None, None, rasterio.enums.Resampling.nearest),
             ("HYP_50M_SR_W.tif", 7, None, None, rasterio.enums.Resampling.cubic),
             ("Iberia.tif", 7, None, None, rasterio.enums.Resampling.cubic),
-            ("c_gls_SCE500_202112070000_CEURO_MODIS_V1.0.1.nc", 7, None, None, rasterio.enums.Resampling.nearest),
+            ("c_gls_SCE500_202112070000_CEURO_MODIS_V1.0.1.nc", 8, None, None, rasterio.enums.Resampling.nearest),
         ]
 
         for input_file_name, res_idx, input_crs, nc_variable, resampling in datasets:
