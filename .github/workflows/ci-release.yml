@@ -1,13 +1,12 @@
 name: Python package release
 
-# Works only on pushes to the main branch with tags that start with "0"
+# Works only on pushes with commits tagged with anything that start with "0" or "1"
 # ("alpha", automatically generated tags start with v)
 on:
   push:
-    branches:
-      - main
     tags:
       - 0*
+      - 1*
 
 jobs:
   build-and-unit-tests:
