@@ -87,7 +87,7 @@ def scale_raster(input_file_path: str, output_file_path: str, scale_factor_x: fl
         data = raster.read(
             out_shape=(
                 raster.count,  # We keep the same number of bands of the input file
-                # TODO: Make ceil/floor/even round? a parameter
+                # Ceil/floor/ even round?, could be a parameter in this method
                 # Ceil: we do not lose any information, but for the latest row and column of pixels, we just
                 # really had information about part of it in the original data so we are extrapolating ("inventing")
                 # Floor: we may loose some information, but we don't have to extrapolate, all we do
@@ -146,7 +146,7 @@ def reproject_raster(input_file_path: str, output_file_path: str, dst_crs: raste
         else:
             set_dst_nodata = dst_nodata
 
-        # TODO: GeoTIFF just supports a single nodata value for all bands. If the input file has
+        # GeoTIFF just supports a single nodata value for all bands. If the input file has
         # a different nodata per band, the result will not be exactly as expected. Other output
         # format should be allowed (or at least a warning provided)
         kwargs = raster.meta.copy()
@@ -194,9 +194,6 @@ def get_geodesic_size_from_raster_profile(profile: rasterio.profiles.Profile, el
     return geodesic_diagonal, res
 
 
-# TODO: This is pretty slow, especially for large-ish datasets. If both have the same resolution
-# it should be possible to use numpy to facilitate and make them faster the comparisons.
-# Maybe there are some other optimizations for that and other cases.
 def calculate_rmse(control_file_path: str, test_file_path: str, every_rows: int = 1,
                    every_cols: int = 1, band: int = 1) -> Tuple[float, float]:
     """

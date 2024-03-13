@@ -31,7 +31,7 @@ def bounds_to_left_top_right_bottom(bounds: Iterable[float], input_crs: Any):
         # Most common situation (X/Y or lon/lat, Easting/Northing)
         left, top, right, bottom = minx, maxy, maxx, miny
     else:
-        # TODO: Check which combination we have, and set left, top, right and bottom in accordance
+        # Check which combination we have, and set left, top, right and bottom in accordance
         # Every possible combination between Easting/Northing, Northing/Easting,
         # Westing/Southing, Southing/Westing... I don't know if all of them are really possible
         raise NotImplementedError(f"This axis combination {axis_info} has not been implemented and tested yet")

@@ -21,8 +21,8 @@ def geodataframe_to_postgis(gdf: GeoDataFrame, table_name: str, username: str, p
     """
        Saves gdf as table_name in a PostGIS DB.
        It stores the gdf "as is" (using GeoPandas to_postgis function).
-       TODO: IT FAILS IF YOU TRY TO USE A GDF WITH A NON-EPSG CRS (E.G., RHEALPIX DEFINED AS A WKT STRING) UNLESS
-       gdf.crs is previously set to None.
+       It Fails if you have a gdf with a non-EPSG CRS (such as rHEALPix is a WKT string), unless
+       gdf.crs is set to None before calling this.
        """
     engine = sqlalchemy.create_engine(f"postgresql://{username}:{password}@{host}:{port}/{database}")
     gdf.to_postgis(table_name, engine, if_exists=if_exists, schema=schema, index=index, index_label=index_label,

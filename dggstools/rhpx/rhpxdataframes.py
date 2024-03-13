@@ -35,15 +35,12 @@ class RHEALPixDataFrameHelper:
         self.rdggs_helper = RHEALPixDGGSHelper(self.rdggs)
 
 
-    # TODO: Writing directly from to a geopackage (or other format?) instead of passing through
-    # a GeoDataFrame would save time (I think; if done properly) and RAM
     def rhealpix_file_to_geodataframe(self, input_file_path: str,
                                       geo_id_column_name: str = "cellid", add_uid: bool = False,
                                       values_in_json: bool = False, store_nodata: bool = False) -> GeoDataFrame:
         """
         Takes a raster file with the CRS corresponding to self.rdggs, and generates a GeoDataFrame with the contents
         of its non empty cells, explicit cellids and some metadata.
-        TODO: Extend this with more information on the contents when it is more stable
         """
         profile = get_raster_profile(input_file_path)
         left, top, right, bottom, resx, resy = get_bbox_from_raster_profile(profile)
@@ -64,9 +61,6 @@ class RHEALPixDataFrameHelper:
 
         # Generate the cell ids (and values after that) contained in a given rhealpix file without
         # using the cells_from_region (or improve that function)
-        # TODO: THIS IS PROBABLY NOT THE MOST EFFICIENT WAY TO DO THIS. FOR LARGE-ISH AND HIGH-ISH RESOLUTION
-        # DATASETS, THIS NEEDS TO BE DONE WITHOUT REQUIRING TO LOAD ALL DATA (TWICE!) IN RAM OR WE WILL FIND
-        # PROBLEMS SOONER OR LATER
 
         cells = {geo_id_column_name: [], "geometry": []}
         if values_in_json:
@@ -132,7 +126,7 @@ class RHEALPixDataFrameHelper:
                                f"because limitations in the file format (e.g., they could be RGB(0,0,0). You should check "
                                f"your dataset if you find problems with this transformation.")
 
-        # TODO: SHOULD CELLID BE THE INDEX OF THE DATAFRAME OR JUST A NORMAL COLUMN?
+        # The cellid column could be the index of the dataframe. Think about it.
         gdf = GeoDataFrame(cells, crs=self.rdggs_helper.rhealpixdef_to_proj_string())
 
         if not values_in_json:
@@ -244,8 +238,7 @@ class RHEALPixDataFrameHelper:
                             # If we don't use our _NpEncoder, types such as int16 are not properly converted to json
                             cells["all_bands"][idx] = json.dumps(all_bands_dict, cls=_NpEncoder)
 
-        # TODO: SHOULD CELLID BE THE INDEX OF THE DATAFRAME OR JUST A NORMAL COLUMN?
-        # TODO: Is it possible to modify the original_gdf in place, without many changes to the code
+        # The cellid column could be the index of the dataframe. Think about it.
         gdf = GeoDataFrame(cells, crs=self.rdggs_helper.rhealpixdef_to_proj_string())
 
         if not values_in_json:
@@ -268,7 +261,6 @@ class RHEALPixDataFrameHelper:
         """
         Takes a GeoDataFrame produced by the rhealpix_file_to_geodataframe method and produces a GeoTiff with
         the same contents.
-        TODO: Extend this with more information on the contents when it is more stable
         """
         output_crs = rasterio.crs.CRS.from_string(self.rdggs_helper.rhealpixdef_to_proj_string())
 
@@ -422,7 +414,8 @@ class RHEALPixDataFrameHelper:
         height = math.floor((maxy - miny) / resx) - 1 # resx must be equal to resy
         width = math.floor((maxx - minx) / resx) - 1
 
-        # Prevents a division by zero, but TODO: this should not be necessary
+        # Prevents a division by zero. It is possible that this should be an exception as I don't imagine
+        # a situation where this would be OK, but rounding and very low resolutions could lead to this, I suppose
         if height <= 0:
             height = 1
         if width <= 0:

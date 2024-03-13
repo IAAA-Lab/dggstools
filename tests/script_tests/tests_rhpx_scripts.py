@@ -64,7 +64,7 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         assert "OK" in result.stdout
 
         # Point dataset. It also works, but rasterizing points as this is not very useful
-        # Binning the points would be more useful (TODO)
+        # Binning the points would be more useful
         result = self.runner.invoke(main.app, ["vec-to-rhpx-ras",
                                                "NYC_Noise_Part_UTM_18N_WGS84.gpkg",
                                                "NYC.tif",

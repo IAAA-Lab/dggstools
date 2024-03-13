@@ -9,15 +9,6 @@ from .utils.rasterutils import *
 logger = logging.getLogger(__name__)
 
 
-# TODO: Generate two rasters (or something like that), one with the data reprojected to rhealpix and the other
-# one with the error_msg per cell (information lost, extrapolated...) could be interesting. This is something
-# that needs to be carefully thought
-
-# TODO: Think about the implications of the different resampling strategies, as the differences for
-# different datasets/domains are clear. This must be clearly communicated to the users of the
-# reprojected/dggs data, specially if the data was downsampled (to lower resolution than the original).
-
-
 class RescalingStrategy(Enum):
     TO_HIGHER = 1
     TO_LOWER = 2
@@ -97,7 +88,7 @@ def _reproject_raster_to_rhealpix(rdggs: RHEALPixDGGS, input_file_path: str, out
         else:
             set_dst_nodata = dst_nodata
 
-        # TODO: GeoTIFF just supports a single nodata value for all bands. If the input file has
+        # GeoTIFF just supports a single nodata value for all bands. If the input file has
         # a different nodata per band, the result will not be exactly as expected. Other output
         # format should be allowed (or at least a warning provided)
         kwargs = raster.meta.copy()
@@ -122,9 +113,9 @@ def _reproject_raster_to_rhealpix(rdggs: RHEALPixDGGS, input_file_path: str, out
                     dst_crs=dst_crs,
                     resampling=resampling)
             dst.update_tags(n_side=rdggs.N_side)
-            # TOFIX: AREA_OR_POINT DOES NOT GET WRITTEN TO THE OUTPUT FILE. But I can write anything else
+            # AREA_OR_POINT DOES NOT GET WRITTEN TO THE OUTPUT FILE. But I can write anything else
             # I haven't found a way to write this in dst.
-            # TODO: Once I do, parameterize this function (and raster_to_rhealpix and maybe others) so the
+            # Once I do, parameterize this function (and raster_to_rhealpix and maybe others) so the
             # client code can decide which one is used
             # None of this, among others, work
             # dst.update_tags(AREA_OR_POINT="Point")
@@ -138,8 +129,6 @@ def _reproject_raster_to_rhealpix(rdggs: RHEALPixDGGS, input_file_path: str, out
 
 
 
-
-# TODO: If the original file is not a geotiff, we should verify that the output file has the tif extension or adding it
 def raster_to_rhealpix(rdggs: RHEALPixDGGS, input_file_path: str, output_file_path: str, dst_resolution_idx: int = -1,
                        rescaling_strategy: RescalingStrategy = RescalingStrategy.TO_CLOSEST,
                        input_crs: rasterio.crs.CRS = None,

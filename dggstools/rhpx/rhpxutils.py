@@ -48,8 +48,6 @@ def cellidstr_to_suid(cellid: str) -> List:
 def cellid_resolution_idx(cellid: str) -> int:
     return len(cellid) - 1
 
-# TODO: TEST ALL THESE METHODS
-
 def get_parent_cellid(cellid: str) -> str:
     if len(cellid) <= 1:
         return ""

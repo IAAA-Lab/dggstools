@@ -13,9 +13,6 @@ from .utils.utils import *
 from rasterio import features
 from rasterio.warp import *
 
-# TODO: ALLOW TO HAVE MORE THAN ONE PROPERTY AS VALUES FOR THE OUTPUT DATA (POSSIBLY AS DIFFERENT BANDS?)
-# TODO: WHAT TO DO FOR POINTS AND LINES?
-
 logger = logging.getLogger(__name__)
 
 
@@ -152,9 +149,6 @@ def vector_to_rhealpix(rdggs: RHEALPixDGGS, input_file_path: str, output_file_pa
         out_shape=(height, width))
 
     __write_image(insert_suffix(output_file_path, "_tmp"), image, input_crs, width, height, transform)
-
-    # TODO: area_or_point should be Pixel if the vector dataset is a point or line dataset (maybe?)
-    # and Area if polygons (always?)
 
     # If input data is not projected, the rescaling strategy will fail, so we pass along dst_resolution_idx
     if not input_crs.is_projected or not input_crs.linear_units == "metre":
@@ -369,7 +363,7 @@ def _vector_to_optimal_set_of_cuids(rdggs: RHEALPixDGGS, input_file_path: str, o
 
                         corresponding_cells = _calculate_corresponding_cells()
                         if corresponding_cells == max_corresponding_cells:
-                            # TODO: This is quite inefficient. We are not just using the fact that the
+                            # This seems quite inefficient. We are not just using the fact that the
                             # input data is aligned to the DGGS, so finding out which cellid corresponds to
                             # the current row and col could be done faster than this
                             x, y = current_resolution_raster.xy(row, col)
@@ -398,6 +392,8 @@ def calculate_vector_raster_area_error(vector_file_path: str, raster_file_path: 
     Take a vector file and a rasterized rhealpix file version and measures the area of
     each geometry in vector file and compares it with the areas of the cells which correspond to
     that geometry in the vector file.
+    It will work for rasters which are not in rhealpix, but the results may be less precise depending
+    on the areal distortion of their CRS.
     The correspondence is based on the value of property_for_class an layer in the vector file, and the
     given band (by default 1) in the raster file. This values identify feature classes, so the
     comparison essentially consists in measuring the difference in the areas of each feature
@@ -465,11 +461,13 @@ def calculate_vector_raster_area_error(vector_file_path: str, raster_file_path: 
                     # Correct cell_area with the areal distortion of rhealpix
                     cell_area = cell_area / RHEALPIX_MEAN_AREAL_DISTORTION
             except KeyError:
-                # proj key is not in the data dictionary; it won't be rhealpix, we don't have to do anything
+                # proj key is not in the data dictionary; it won't be rhealpix.
+                # Other projections may have similar distortions. rhealpix is considered first as this is a
+                # dggs library, but this area should be corrected (or calculated in another way) for other
+                # crs which are not area-preserving
+                logger.warning("The input raster is not in rhealpix. This method results may be less precise "
+                               "than expected.")
                 pass
-            # TODO: Other projections may have similar distortions. rhealpix is considered first as this is a
-            # dggs library, but this area should be corrected (or calculated in another way) for other
-            # crs which are not area-preserving
         else:
             # I am assuming WGS84, which is used by default in get_geodesic_size_from_raster_profile
             _, res = get_geodesic_size_from_raster_profile(raster.profile)
@@ -508,6 +506,19 @@ def calculate_vector_raster_line_error(vector_file_path: str, raster_file_path: 
                                        every_feature: int = 1,
                                        layer: Union[str, int] = None) -> Tuple[float, float]:
     """
+        This function is barely tested, and I am not sure if it is really useful. Besides this general
+        warning there are a couple of known pending issues:
+        - I assume that it is possible that the x and y coordinates of the nodes of the lines are inverted
+        (lat/lon vs lon/lat). This is now not considered.
+        - Cells in the raster that are marked as feature but where there is no feature are not counted
+        as errors. I expect that a proper rasterization will minimize those. And it is not trivial to check
+        for this, as looking only at the nodes of the lines would not be enough, and we would have to
+        essentially rasterize the vector lines again... :-/
+        - If a node falls into an empty cell, or in a cell with a different feature class (probably because in the
+        original vector file there where several features with different classes which were close to each
+        other) that cell for now is not counted at all, but IT PROBABLY SHOULD ADD SOME ERROR MSG
+
+
         Take a vector file with lineal features and a rasterized rhealpix file version and measures
         the average distance between each node in the features and the center of the raster cells
         where those nodes are.
@@ -519,17 +530,9 @@ def calculate_vector_raster_line_error(vector_file_path: str, raster_file_path: 
         The correspondence is based on the value of property_for_class and layer in the vector file, and
         the given band (by default 1) in the raster file.
 
-        If a node falls into an empty cell, or in a cell with a different feature class (probably because in the
-        original vector file there where several features with different classes which were close to each
-        other) that cell for now is not counted at all, but TODO it probably should add some error_msg.
-
         The result is the total sum of the distances between each node and its corresponding raster cell
         center divided by the num of nodes, and by the num of features.
 
-        TODO: Cells in the raster that are marked as feature but where there is no feature are not counted
-        as errors. I expect that a proper rasterization will minimize these. And it is not trivial to check
-        for this, as looking only at the nodes of the lines would not be enough, and we would have to
-        essentially rasterize the vector lines again... :-/
         """
     band_idx = band - 1  # bands start in 1 for gdal/rasterio, but in the np array they start at 0
     nodes = []  # to store every point in the input lines along with its feature class
@@ -599,7 +602,7 @@ def calculate_vector_raster_line_error(vector_file_path: str, raster_file_path: 
                 py = p[1]
 
             # row and col of the cell corresponding to the feature node point
-            r, c = raster.index(px, py)  # TODO X AND Y COULD BE INVERTED?
+            r, c = raster.index(px, py)  # X and Y could be inverted. THIS IS NOT CONSIDERED YET
             # Center of the r,c cell (it will normally not be p[0],p[1]. The difference is the error_msg we measure
             x, y = raster.xy(r, c)
             if raster_crs.is_projected:

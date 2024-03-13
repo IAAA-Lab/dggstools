@@ -19,10 +19,6 @@ from dggstools.rhpx.utils.storage import geodataframe_to_geopackage, get_gpkg_rh
     geopackage_to_rhealpix
 
 
-# TODO: Many tests here are essentially smoke tests and the results produced by them must be checked manually if you
-# need to be sure that they produce the correct results. Curating a set of test datasets, with the expected results
-# after the different transformations, and using that in the tests to make sure that the results are what is
-# expected is pending work.
 class DataTestsSpec(unittest.TestCase):
 
     # This runs once for the whole class
@@ -138,7 +134,7 @@ class DataTestsSpec(unittest.TestCase):
     # Tests for now are pretty naive. Unless there are some exceptions, they will pass
     def test_raster_datasets(self):
         datasets = [
-            # TODO: After reprojecting the nasadem file to rhealpix and showing in QGIS it has a weird behaviour:
+            # After reprojecting the nasadem file to rhealpix and showing in QGIS it has a weird behaviour:
             # for example some rows seem to have smaller (less "tall") pixels than others. There might be some issues
             # with QGIS visualization (visualization of rhealpix some times is tricky), but this needs to be checked.
             ("nasadem.tif", 9, None, None, rasterio.enums.Resampling.nearest),
@@ -185,7 +181,8 @@ class DataTestsSpec(unittest.TestCase):
         for input_file_name, res_idx, input_crs in datasets:
             self._test_raster_alignments(input_file_name, res_idx, input_crs)
 
-    # TODO: Support for some of these datasets axis combination is not yet ready in vectorutils. Fix that
+    # Support for some of these datasets axis combination is not yet ready in vectorutils. Fix that
+    # and add them again
     # def test_vector_datasets(self):
     #     datasets = [
     #         ("Comunidades_Autonomas_ETRS89_30N.shp", 7, None, "Codigo", None),
@@ -263,7 +260,8 @@ class DataTestsSpec(unittest.TestCase):
         self.logger.info(
             f"******************* Ratio Error/Vec Area {input_file_name}: {error / vec_area}")
 
-    # TODO: Support for some of these datasets axis combination is not yet ready in vectorutils. Fix that
+    # Support for some of these datasets axis combination is not yet ready in vectorutils. Fix that
+    # and then uncomment this again
     # def test_calculate_vector_raster_area_error(self):
     #     datasets = [
     #         ("Aragón_ETRS89_30N.shp", 8, None, "CODIGO", None),
@@ -300,7 +298,8 @@ class DataTestsSpec(unittest.TestCase):
             f"******************* Error {input_file_name}: mean distance per node {error_per_node / 1000} km, "
             f"mean distance per feature {error_per_feature / 1000} km.")
 
-    # TODO: Support for some of these datasets axis combination is not yet ready in vectorutils. Fix that
+    # Support for some of these datasets axis combination is not yet ready in vectorutils. Fix that
+    # and then uncomment this again
     # def test_calculate_vector_raster_line_error(self):
     #     datasets = [
     #         ("oprvrs_gb_WGS84.gpkg", 9, None, None, None, 200),  # With res 12 the process is killed in my
@@ -398,7 +397,7 @@ class DataTestsSpec(unittest.TestCase):
         # idx, res = self.rdggs_helper.get_closest_resolution(100000)
         # Or I want a fixed resolution index
         idx=0
-        # TOFIX: This does not work for idx=5 and other resolutions, with different bounding boxes.
+        # This does not work for idx=5 and other resolutions, with different bounding boxes.
         # This appears to be due to some vertices from some cells falling out of the rhealpix "image".
         # I am not sure where the problem is: some vertices of some cells in rHEALPix are actually
         # outside of those cells. But the vertices operation in the Cell class, should take/is taking
@@ -413,7 +412,7 @@ class DataTestsSpec(unittest.TestCase):
         # We temporarily "patch" the rhealpix library to make sure that all cells are
         # included in the grid. This is not the best solution, but allows to generate all grids
         # (although it is not clear if every cell in them is correct, or if some cells
-        # are missing. TODO: Find out if there is a definitive best solution for this
+        # are missing.
         rhealpixdggs.pj_healpix.in_healpix_image = lambda x, y: True
         rhealpixdggs.pj_rhealpix.in_rhealpix_image = lambda x, y, south_square, north_square: True
 
@@ -683,8 +682,7 @@ class DataTestsSpec(unittest.TestCase):
                                os.path.join(self.temp_dir, "landsat_image_small_gpkg_321.tif"))
 
         # At this point landsat_image_small_rhpx_321.tif and landsat_image_small_gpkg_321.tif should be equivalent
-        # save from minor details (e.g. compression scheme in the GeoTIFF). TODO: TEST THIS, for now this have
-        # been manually verified, but it should be automated.
+        # save from minor details (e.g. compression scheme in the GeoTIFF).
 
 
 
