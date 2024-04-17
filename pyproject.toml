@@ -9,7 +9,7 @@ version = "0.1.0"
 dynamic = ["dependencies"]
 
 [project.scripts]
-git4grids = "dggstools.__main__:app"
+dggstools = "dggstools.__main__:app"
 
 [tool.setuptools]
 packages = ["dggstools", "dggstools.auids", "dggstools.rhpx", "dggstools.rhpx.utils"]
