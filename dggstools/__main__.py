@@ -15,6 +15,8 @@ from dggstools.rhpx.utils.storage import  get_gpkg_rhpx_metadata, rhealpix_to_ge
 
 app = typer.Typer()
 
+INPUT_CRS_HELP = "If not provided, the input file CRS will be used. If provided it must be a string parseable by rasterio.crs.CRS.from_string()."
+RDGGS_HELP = "rHEALPix system parameters: n_side/north_square/south_square"
 
 def _parse_rdggs(rdggs_str: str) -> RHEALPixDGGS:
     """
@@ -29,26 +31,42 @@ def _parse_rdggs(rdggs_str: str) -> RHEALPixDGGS:
 
     return RHEALPixDGGS(ellipsoid=WGS84_ELLIPSOID, north_square=int(north_square), south_square=int(south_square), N_side=int(n_side))
 
-
 @app.command()
 def vec_to_rhpx_ras(input_file_path: Annotated[str, typer.Argument()],
                     output_file_path: Annotated[str, typer.Argument()],
-                    dst_resolution_idx: Annotated[int, typer.Argument()],
-                    property_for_class: Annotated[Optional[str], typer.Argument()] = None,
-                    fixed_value: Annotated[int, typer.Option()] = 1,
-                    input_crs: Annotated[Optional[str], typer.Option()] = None,
-                    layer: Annotated[Optional[str], typer.Option()] = None,
-                    all_touched: Annotated[bool, typer.Option()] = False,
-                    rdggs: Annotated[str, typer.Option()] = "3/1/0"):
+                    dst_resolution_idx: Annotated[int, typer.Argument(min=0)],
+                    property_for_class: Annotated[Optional[str], typer.Option(help="Name of the attribute in the vector file that will be used for the values in the output raster file. If this parameter is not present, the --fixed-value will be used instead.")] = None,
+                    fixed_value: Annotated[int, typer.Option(help="If --property-for-class is not used, then this is the value that will be used for the cells that correspond to any polygon in the input file.")] = 1,
+                    input_crs: Annotated[Optional[str], typer.Option(help=INPUT_CRS_HELP)] = None,
+                    layer: Annotated[Optional[str], typer.Option(help="If the input file is multilayer, e.g. a GeoPackage, name or index of the layer we want. By default, the first one is used.")] = None,
+                    rdggs: Annotated[str, typer.Option(help=RDGGS_HELP)] = "3/1/0"):
+    """
+    Transforms a vector dataset with polygons in a common GIS format and reference system to a rHEALPix GeoTIFF.
+    This GeoTIFF has a rasterization of the polygons following the constraints of the rHEALPix system (projection,
+    valid resolution and grid alignment).
+
+    --dst_resolution_idx is used to choose the resolution of the output file, by specifying
+    the resolution index (0 is the lowest) we want.
+
+    """
     # layer is Union[str, int] but typer does not support Union
     # I will have to parse it manually
 
     # input_crs must be something that can be parsed by rasterio.crs.CRS.from_string or None
     if input_crs is not None:
         input_crs = rasterio.crs.CRS().from_string(input_crs)
+
+    if layer is not None:
+        # typer does not support Union(str,int) as the type, so we have to do a manual parsing
+        try:
+            layer = int(layer)
+        except ValueError:
+            # It is OK. It is not an int, but a str is also a valid type
+            pass
+
     try:
         vector_to_rhealpix(_parse_rdggs(rdggs), input_file_path, output_file_path, dst_resolution_idx,
-                           property_for_class, fixed_value, input_crs, layer, all_touched)
+                           property_for_class, fixed_value, input_crs, layer)
         result = "OK"
     except Exception as e:
         result = str(e)
@@ -81,16 +99,16 @@ def vec_ras_area_error(vector_file_path: Annotated[str, typer.Argument()],
 
 
 @app.command()
-def ras_to_rhpx_ras(input_file_path: Annotated[str, typer.Argument(help="Input raster file path")],
-                    output_file_path: Annotated[str, typer.Argument(help="Output GeoTIFF file path")],
+def ras_to_rhpx_ras(input_file_path: Annotated[str, typer.Argument()],
+                    output_file_path: Annotated[str, typer.Argument()],
                     rescaling_strategy: Annotated[
                               RescalingStrategy, typer.Argument()] = RescalingStrategy.TO_CLOSEST.value,
                     dst_resolution_idx: Annotated[Optional[int], typer.Option(min=0, help="If not provided, the rescaling-strategy will be used instead.")] = None,
-                    input_crs: Annotated[Optional[str], typer.Option(help="If not provided, the input file CRS will be used. If provided it must be a string parseable by rasterio.crs.CRS.from_string().")] = None,
+                    input_crs: Annotated[Optional[str], typer.Option(help=INPUT_CRS_HELP)] = None,
                     # resampling is passed as a string, because rasterio.enums-Resampling is an IntEnum (not a StrEnum) and using numbers is less user-friendly
                     resampling: Annotated[
                         str, typer.Option(help=f"{[r.name for r in rasterio.enums.Resampling]}")] = rasterio.enums.Resampling.nearest.name,
-                    rdggs: Annotated[str, typer.Option(help="rHEALPix system parameters: n_side/north_square/south_square")] = "3/1/0"):
+                    rdggs: Annotated[str, typer.Option(help=RDGGS_HELP)] = "3/1/0"):
     """
     Transforms a raster dataset in a common GIS format and reference system to a rHEALPix GeoTIFF. This includes: warping to the rHEALPix projection, resampling to one of the allowed rHEALPix
     resolutions (which depend on the rHEALPix system being used) and aligning to that rHEALPix grid.
