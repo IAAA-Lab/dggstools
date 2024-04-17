@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class RescalingStrategy(Enum):
-    TO_HIGHER = 1
-    TO_LOWER = 2
-    TO_CLOSEST = 3  # It will be the higher or the lower, the one which is closest
+    TO_HIGHER = "higher"
+    TO_LOWER = "lower"
+    TO_CLOSEST = "closest"  # It will be the higher or the lower, the one which is closest
 
 
 def _reproject_raster_to_rhealpix(rdggs: RHEALPixDGGS, input_file_path: str, output_file_path: str,

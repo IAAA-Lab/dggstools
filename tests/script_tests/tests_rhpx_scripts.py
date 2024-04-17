@@ -79,14 +79,14 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         result = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
                                                "landsat_image_small.tif",
                                                "landsat_image_small-rHEALPIX.tif",
-                                               "12"])
+                                               "--dst-resolution-idx", "12"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
         result = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
                                                "landsat_image_small.tif",
                                                "landsat_image_small-rHEALPIX2.tif",
-                                               "14",
+                                               "--dst-resolution-idx", "14",
                                                "--rdggs", "2/1/0"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
@@ -112,7 +112,7 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         result = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
                                                "landsat_image_small.tif",
                                                "landsat_image_small-rHEALPIX.tif",
-                                               "11"])
+                                               "--dst-resolution-idx", "11"])
         assert result.exit_code == 0
         assert "OK" in result.stdout
 
@@ -144,7 +144,7 @@ class RhpxScriptTestsSpec(unittest.TestCase):
         _ = self.runner.invoke(main.app, ["ras-to-rhpx-ras",
                                                "landsat_image_small.tif",
                                                "landsat_image_small-rHEALPIX-921.tif",
-                                               "11"])
+                                               "--dst-resolution-idx", "11"])
         _ = self.runner.invoke(main.app, ["ras-rhpx-to-vec-rhpx",
                                                "landsat_image_small-rHEALPIX-921.tif",
                                                "landsat_image_small-rHEALPIX-921.gpkg"])
