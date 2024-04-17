@@ -80,6 +80,16 @@ def vec_ras_area_error(vector_file_path: Annotated[str, typer.Argument()],
                        input_crs: Annotated[Optional[str], typer.Option()] = None,
                        band: Annotated[int, typer.Option()] = 1,
                        layer: Annotated[Optional[str], typer.Option()] = None):
+    """
+    Takes a vector file and a rasterized rHEALPix version (as produced by the vec-to-rhpx-ras command) and:
+     - measures the area of each geometry in vector file;
+     - compares each of these areas with the areas of the cells which correspond to that geometry in the vector file.
+    This is an experimental, not thoroughly tested and barely documented command, and
+    should be used just for testing purposes.
+
+    It will work for raster files which are not in rHEALPix too, but the results may be less precise depending on the
+    areal distortion of their projection.
+    """
     # layer is Union[str, int] but typer does not support Union
     # I will have to parse it manually
 
@@ -143,16 +153,29 @@ def ras_to_rhpx_ras(input_file_path: Annotated[str, typer.Argument()],
     print(result)
 
 @app.command()
-def ras_rhpx_to_vec_rhpx(input_file_path: Annotated[str, typer.Argument(help="Input raster file path")],
-                         output_file_path: Annotated[str, typer.Argument(help="Output GeoTIFF file path")],
-                         geo_id_column_name: Annotated[str, typer.Option()] = "cellid",
-                         layer_name: Annotated[str, typer.Option()] = "data",
-                         add_uid: Annotated[bool, typer.Option()] = False,
-                         values_in_json: Annotated[bool, typer.Option()] = False,
-                         store_nodata: Annotated[bool, typer.Option()] = False):
+def ras_rhpx_to_vec_rhpx(input_file_path: Annotated[str, typer.Argument()],
+                         output_file_path: Annotated[str, typer.Argument()],
+                         geo_id_column_name: Annotated[str, typer.Option(help="Name of the column that will contain the cell identifier.")] = "cellid",
+                         layer_name: Annotated[str, typer.Option(help="Name of the table in the output GeoPackage.")] = "data",
+                         add_uid: Annotated[bool, typer.Option(help="If True, adds a column named uuid with a random UUID4 for each row in the output.")] = False,
+                         values_in_json: Annotated[bool, typer.Option(help="If True, all bands are put together in a single column, in JSON format.")] = False):
+    """
+    Transforms a rHEALPix GeoTIFF dataset produced by dggstools to a vector dataset in the GeoPackage format.
+
+    This GeoPackage has a point for each cell in the GeoTIFF (its centroid) and is equivalent to the raster
+    version, up to the point that you can obtain back the original raster dataset from this GeoPackage, with
+    only minor differences due to implementation details of the GeoTIFF format.
+
+    Besides this, the GeoPackage is a normal vector dataset, that can be processed by any GIS application, as long as
+    it can use the rHEALPix projection.
+
+    The GeoPackage will have a column with the identifier (address) for each cell (--geo-id-column-name),
+    and additional columns corresponding to the bands of the GeoTIFF (unless --values-in-json is used, in which case
+    all bands will be in a single column named all_bands, in JSON format).
+    """
     try:
         rhealpix_to_geopackage(input_file_path,
-                               output_file_path, geo_id_column_name, layer_name, add_uid, values_in_json, store_nodata)
+                               output_file_path, geo_id_column_name, layer_name, add_uid, values_in_json)
         result = "OK"
     except Exception as e:
         result = str(e)
@@ -161,8 +184,15 @@ def ras_rhpx_to_vec_rhpx(input_file_path: Annotated[str, typer.Argument(help="In
 @app.command()
 def vec_rhpx_to_ras_rhpx(input_file_path: Annotated[str, typer.Argument()],
                          output_file_path: Annotated[str, typer.Argument()],
-                         nodata: Annotated[float, typer.Option()] = 0):
-    # nodata can be int or float, but typer does not support Union types
+                         nodata: Annotated[float, typer.Option(help="Value for the NODATA pixels in the output raster; if you want it to be used as an INTEGER, don't write a decimal point.")] = 0.0):
+    """
+    Transforms a vector dataset in rHEALPix produced by dggstools with the ras-rhpx-to-vec-rhpx command, to
+    a raster dataset in GeoTIFF which is very similar to the one that was used as the original input to that operation.
+    """
+    # nodata can be int or float, but typer does not support Union types, so:
+    if isinstance(nodata, int):
+        nodata = int(nodata)
+
     try:
         geopackage_to_rhealpix(input_file_path, output_file_path, nodata)
         result = "OK"
@@ -173,6 +203,11 @@ def vec_rhpx_to_ras_rhpx(input_file_path: Annotated[str, typer.Argument()],
 
 @app.command()
 def print_vec_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
+    """
+    Takes a GeoPackage file produced by dggstools and prints the metadata that dggstools stores in it. This metadata
+    are necessary to store some rHEALPix system specific information, and some other information that can be useful
+    if you want the original raster file back.
+    """
     try:
         metadata = get_gpkg_rhpx_metadata(input_file_path)
         result = str(metadata) + "\nOK"
@@ -182,6 +217,10 @@ def print_vec_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
 
 @app.command()
 def print_ras_rhpx_metadata(input_file_path: Annotated[str, typer.Argument()]):
+    """
+    Takes a GeoTIFF file produced by dggstools and prints the metadata that dggstools stores in it. This metadata
+    are necessary to store some rHEALPix system specific information.
+    """
     try:
         metadata = get_gdf_attrs_from_rhealpix_file(input_file_path)
         result = str(metadata) + "\nOK"
