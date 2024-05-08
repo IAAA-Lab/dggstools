@@ -12,7 +12,7 @@ a DGGS (rHEALPix for now).
 ## Install the package and the command line tool
 1. Download the latest package released on the GitHub Repository:
 
-Get the .whl file from <https://github.com/IAAA-Lab/dggstools/releases/tag/v0.1.0a202402141926>.
+Get the .whl file from <https://github.com/IAAA-Lab/dggstools/releases/latest>.
 
 2. Install the package and command line tool
 
