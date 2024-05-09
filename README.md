@@ -1,28 +1,33 @@
-# dggstools
+# DGGSTools
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10659071.svg)](https://doi.org/10.5281/zenodo.10659071)
 
-Tools to manipulate raster and vector GIS data in the spatial framework provided by a DGGS.
+A python library and command line tool to manipulate raster and vector GIS data in the spatial framework provided by 
+a DGGS (rHEALPix for now).
 
 **Requirements**
-- Python 3.11 or higher
+- Python 3.10 or higher
 - `pip` for installing Python packages
-- `GDAL` as dependency. 
-- A minimum of 4 GB RAM (8 GB recommended for optimal performance)
-- At least 10 GB of free disk space
-- An active internet connection for downloading necessary Python packages
-- Operating system: Windows, macOS, or Linux
 
-Alternatively, we provide a Docker file for simplifying deployment and ensuring consistency across different development environments.
+## Install the package and the command line tool
+1. Download the latest package released on the GitHub Repository:
 
-## Install and test instructions
+Get the .whl file from <https://github.com/IAAA-Lab/dggstools/releases/latest>.
 
-`dggstools` uses the native `unittest` framework for testing.
+2. Install the package and command line tool
 
-All the necessary data for end-to-end testing is also included in the repository, ensuring you can validate the functionality of dggstools right after installation.
+```
+pip install ./name-of-the-file-you-have-downloaded.whl
+```
 
+3. Now you can run dggstools in the command line:
 
-### Docker version
+```
+dggstools --help
+```
+
+## Installation with Docker
+We provide a Docker file for simplifying deployment and ensuring consistency across different development environments.
 
 Build the image with:
 
@@ -36,18 +41,28 @@ Run the tests with:
 docker run --rm dggstools python -m unittest discover -s tests -p '*.py'
 ```
 
-### Native python install 
+## Installation from sources 
 
-To install `dggstools`, you can follow these steps:
+To install `dggstools`, you can follow these steps right after you clone the Git repository (in its root directory):
 
-1. Install the dependencies using pip and the provided `requirements.txt` file:
-
-```
-pip install -r requirements.txt
-```
-
-2. To install the `dggstools` package itself, run:
+1. Update the build tools:
 
 ```
-python setup.py install
+pip install --upgrade pip          
+pip install --upgrade build
+pip install --upgrade wheel
+```
+
+2. Install the dependencies and build the `dggstools` package:
+
+```
+pip install .
+```
+
+3. Run the provided tests to see if everything is working (optional)
+The package `dggstools` uses the `unittest` framework for testing. All the necessary data to run the tests are also included in the 
+repository.
+
+```
+python -m unittest discover -s tests/data_tests -p '*.py'
 ```
