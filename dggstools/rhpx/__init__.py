@@ -1,4 +1,6 @@
-"""rhpx"""
+"""
+The rhpx module supports the manipulation of rHEALPix datasets.
+"""
 
 import logging
 
