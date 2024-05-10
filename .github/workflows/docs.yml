@@ -44,4 +44,4 @@ jobs:
         uses: actions/deploy-pages@v4
       - name: change page url
         id: change-page-url
-        run: echo "new_page_url=${{ steps.deployment.outputs.page_url }}${{github.ref_name}}/" >> $GITHUB_OUTPUT
+        run: echo "new_page_url=${{ steps.deployment.outputs.page_url }}${{ github.ref_name }}/" >> $GITHUB_OUTPUT
