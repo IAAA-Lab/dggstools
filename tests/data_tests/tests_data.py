@@ -36,7 +36,7 @@ class DataTestsSpec(unittest.TestCase):
         # Configuration for the logs (including those of every library used that produces logs)
         logging.basicConfig(format="[%(filename)s:%(lineno)s - %(funcName)20s()] %(message)s", level=logging.INFO)
 
-        cwd = os.getcwd()
+        cls.cwd = os.getcwd()
         try:
             data_dir = os.environ['GEO2DGGS_TEST_DATA_DIR']
             cls.data_dir = data_dir
@@ -47,12 +47,18 @@ class DataTestsSpec(unittest.TestCase):
                 cls.data_dir = Path("test_data")
             elif os.path.exists("tests/test_data"):
                 cls.data_dir = Path("tests/test_data")
-        os.chdir(cwd)
+        os.chdir(cls.cwd)
         cls.temp_dir = tempfile.mkdtemp()
         shutil.copytree(cls.data_dir, cls.temp_dir, dirs_exist_ok=True)
         cls.data_dir = Path(cls.temp_dir)
         cls.output_dir = cls.temp_dir
         os.chdir(cls.temp_dir)
+
+    # This runs once for the whole class
+    @classmethod
+    def tearDownClass(cls):
+        # Restore the original working directory (might be necessary in some CI scenarios etc.)
+        os.chdir(cls.cwd)
 
     def log_some_info(self, input_file_path, dst_resolution_idx):
         with rasterio.open(input_file_path) as raster:
