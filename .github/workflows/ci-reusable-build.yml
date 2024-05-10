@@ -16,7 +16,7 @@ jobs:
           python -m pip install --upgrade pip          
           python -m pip install --upgrade build
           python -m pip install --upgrade wheel
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
       - name: Unit tests (fast)
         run: |
           python -m unittest discover -s tests/unit_tests -p '*.py'
