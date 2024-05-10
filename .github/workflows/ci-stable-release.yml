@@ -1,6 +1,6 @@
 name: Python package release
 
-# Run only on pushes with commits tagged with anything that starts with "0" or "1"
+# Run only on tag pushes (i.e. git push origin TAG_ID) as long as TAG_ID starts with "0" or "1"
 on:
   push:
     tags:

@@ -21,7 +21,7 @@ jobs:
           python -m pip install --upgrade pip          
           python -m pip install --upgrade build
           python -m pip install --upgrade wheel
-          if [ -f requirements.txt ]; then pip install -r requirements_dev.txt; fi
+          if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
       - run: pdoc -o docs/ dggstools
 
       - uses: actions/upload-pages-artifact@v3
@@ -42,3 +42,6 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: change page url
+        id: change-page-url
+        run: echo "new_page_url=${{ steps.deployment.outputs.page_url }}${{github.ref_name}}/" >> $GITHUB_OUTPUT
