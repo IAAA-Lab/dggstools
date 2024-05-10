@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10659071.svg)](https://doi.org/10.5281/zenodo.10659071)
 
-A python [library](https://www.iaaa.es/dggstools/dggstools.html) and command line tool to manipulate raster and vector GIS data in the spatial framework provided by 
+A python library (see the [latest version API docs](https://www.iaaa.es/dggstools/dggstools.html) and command line tool to manipulate raster and vector GIS data in the spatial framework provided by 
 a DGGS (rHEALPix for now).
 
 **Requirements**
@@ -10,7 +10,7 @@ a DGGS (rHEALPix for now).
 - `pip` for installing Python packages
 
 ## Install the package and the command line tool
-1. Download the latest package released on the GitHub Repository:
+1. You can download the latest package released on the GitHub Repository if you want the latest, non-stable version:
 
 Get the .whl file from <https://github.com/IAAA-Lab/dggstools/releases/latest>.
 
