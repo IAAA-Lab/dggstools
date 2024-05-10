@@ -1,7 +1,6 @@
 name: Python package release
 
-# Works only on pushes with commits tagged with anything that start with "0" or "1"
-# ("alpha", automatically generated tags start with v)
+# Run only on pushes with commits tagged with anything that starts with "0" or "1"
 on:
   push:
     tags:
@@ -21,11 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build package
-        # For now, every version is an alpha (i.e., CI produced) version.
-        # The base version is an attribute in pyproject.toml
-        # To get the incremental numbering after the "a", we use YYYYMMDDHHMM
+        # The version is an attribute in pyproject.toml (that must be changed after generating the stable version)
         run: |
-          python setup.py egg_info -b "a`date '+%Y%m%d%H%M'`" bdist_wheel
+          python setup.py egg_info bdist_wheel
       - name: Retrieve version
         run: |
           echo "VERSION_TAG=$(find dist -name '*.whl' | awk -F'-' '{ print $2 }')" >> $GITHUB_OUTPUT
@@ -33,7 +30,5 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "dist/*.whl"
-          commit: "main"
-          tag: v${{ steps.version.outputs.VERSION_TAG }}
 
 

@@ -1,6 +1,10 @@
 name: Python build and test
 
-on: [push]
+# Run this on push to branches, but not on push to tags
+on:
+  push:
+    branches:
+      - '**'
 
 jobs:
   build-and-unit-tests:
@@ -9,3 +13,22 @@ jobs:
   data-tests:
     needs: build-and-unit-tests
     uses: ./.github/workflows/ci-reusable-data-tests.yml
+
+  pack-and-release:
+    needs: data-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build package (alpha version)
+        # The base version is an attribute in pyproject.toml
+        # To get the incremental numbering after the "a", we use YYYYMMDDHHMM
+        run: |
+          python setup.py egg_info -b "a`date '+%Y%m%d%H%M'`" bdist_wheel
+      - name: Retrieve version
+        run: |
+          echo "VERSION_TAG=$(find dist -name '*.whl' | awk -F'-' '{ print $2 }')" >> $GITHUB_OUTPUT
+        id: version
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/*.whl"
+          commit: "main"
+          tag: ${{ steps.version.outputs.VERSION_TAG }}
