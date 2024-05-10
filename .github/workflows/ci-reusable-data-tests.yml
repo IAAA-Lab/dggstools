@@ -20,3 +20,4 @@ jobs:
       - name: Tests involving datasets (much slower)
         run: |
           python -m unittest discover -s tests/data_tests -p '*.py'
+          python -m unittest discover -s tests/script_tests -p '*.py'
