@@ -35,9 +35,11 @@ class RhpxScriptTestsSpec(unittest.TestCase):
                     "landsat_image_small.tif", "NYC_Noise_Part_UTM_18N_WGS84.gpkg"]
 
     def setUp(self):
-        os.chdir(self.cwd)
         self.temp_dir = self._create_tempdir_and_copy_data()
         os.chdir(self.temp_dir)
+
+    def tearDown(self):
+        os.chdir(self.cwd)
 
     def _create_tempdir_and_copy_data(self):
         temp_dir = tempfile.mkdtemp()
