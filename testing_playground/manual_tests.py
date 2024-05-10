@@ -6,7 +6,7 @@ import rhealpixdggs.dggs as rhp
 from rasterio.session import AWSSession
 from rhealpixdggs.ellipsoids import Ellipsoid
 
-from dggstools.rhpx.rhpxdataframes import *
+from dggstools.rhpx.rhpx_gdf_helper import *
 from dggstools.rhpx.vector_to_rhpx import *
 from dggstools.rhpx.utils import utils
 from dggstools.rhpx.utils.storage import geodataframe_to_geopackage, geodataframe_to_postgis

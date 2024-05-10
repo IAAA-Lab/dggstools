@@ -10,7 +10,7 @@ from geopandas import GeoDataFrame
 from typing import List, Dict, Any
 
 import dggstools.rhpx.rhpxutils as rhpxutils
-from dggstools.rhpx.rhpxdataframes import RHEALPixDataFrameHelper
+from dggstools.rhpx.rhpx_gdf_helper import RHEALPixDataFrameHelper
 from dggstools.rhpx.utils.rasterutils import get_raster_profile
 
 

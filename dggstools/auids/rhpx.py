@@ -1,8 +1,11 @@
+"""
+Generation of area unique identifiers (AUIDs) for rHEALPix.
+"""
 import networkx as nx
 import re
 
 from typing import Sequence
-import dggstools.auids.auids as auids
+import dggstools.auids.common as auids
 
 
 def is_a_subarea_rhealpix(auid1_comp_b64: str, auid2_comp_b64: str, nil_name: str = auids.DEFAULT_NIL_NAME) -> bool:

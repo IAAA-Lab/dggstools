@@ -1,3 +1,6 @@
+"""
+The RHEALPixDataFrameHelper class supports transforming from raster rhealpix files to GeoDataFrames and vice versa.
+"""
 import json
 
 import numpy

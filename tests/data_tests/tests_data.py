@@ -1,3 +1,4 @@
+import os
 import shutil
 import tempfile
 import unittest
@@ -9,9 +10,9 @@ import time
 
 from sqlalchemy import create_engine
 
-from dggstools.auids.auids import AUIDGenerator
-from dggstools.auids.rhpx_auids import optimize_cuids_rhealpix, is_optimal_cuids_rhealpix, RHEALPixAUIDGenerator
-from dggstools.rhpx.rhpxdataframes import *
+from dggstools.auids.common import AUIDGenerator
+from dggstools.auids.rhpx import optimize_cuids_rhealpix, is_optimal_cuids_rhealpix, RHEALPixAUIDGenerator
+from dggstools.rhpx.rhpx_gdf_helper import *
 from dggstools.rhpx.vector_to_rhpx import _vector_to_optimal_set_of_cuids
 from dggstools.rhpx.vector_to_rhpx import *
 from dggstools.rhpx.utils import utils

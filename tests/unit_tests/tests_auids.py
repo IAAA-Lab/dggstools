@@ -2,8 +2,8 @@ import unittest
 import logging
 from typing import Sequence
 
-from dggstools.auids.auids import generate_bp_auid_from_cuids, generate_cuids_from_bp_auid, AUIDGenerator
-from dggstools.auids.rhpx_auids import is_a_subarea_rhealpix, optimize_cuids_rhealpix, is_optimal_cuids_rhealpix,\
+from dggstools.auids.common import generate_bp_auid_from_cuids, generate_cuids_from_bp_auid, AUIDGenerator
+from dggstools.auids.rhpx import is_a_subarea_rhealpix, optimize_cuids_rhealpix, is_optimal_cuids_rhealpix,\
     RHEALPixAUIDGenerator
 
 

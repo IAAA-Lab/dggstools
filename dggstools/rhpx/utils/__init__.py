@@ -1,0 +1,1 @@
+"""Auxiliary functions used in different parts of the dggstools package."""

@@ -1,3 +1,6 @@
+"""
+Generation of area unique identifiers (AUIDs) for any DGGS.
+"""
 import logging
 import uuid
 import networkx as nx

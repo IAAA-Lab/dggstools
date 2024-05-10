@@ -1,4 +1,6 @@
-import os
+"""
+Functions to transform raster files into rhealpix raster files. The main function is raster_to_rhealpix.
+"""
 from enum import Enum
 
 import rasterio.crs

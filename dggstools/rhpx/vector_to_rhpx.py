@@ -1,3 +1,6 @@
+"""
+Functions to transform vector files into rhealpix raster files. The main function is vector_to_rhealpix.
+"""
 from typing import Dict, Sequence
 
 import fiona
