@@ -38,10 +38,7 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.change-page-url.outputs.new_page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
-      - name: change page url
-        id: change-page-url
-        run: echo "new_page_url=${{ steps.deployment.outputs.page_url }}${{ github.ref_name }}/" >> $GITHUB_OUTPUT
