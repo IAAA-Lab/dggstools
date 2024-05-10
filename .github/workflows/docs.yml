@@ -22,7 +22,7 @@ jobs:
           python -m pip install --upgrade build
           python -m pip install --upgrade wheel
           if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
-      - run: pdoc -o docs/ dggstools
+      - run: pdoc -o docs/ dggstools --footer-text "DGGSTools version "${{ github.ref_name }}
 
       - uses: actions/upload-pages-artifact@v3
         with:
