@@ -43,4 +43,4 @@ jobs:
         with:
           artifacts: "dist/*.whl"
           commit: "main"
-          tag: ${{ steps.version.outputs.VERSION_TAG }}
+          tag: v${{ steps.version.outputs.VERSION_TAG }}
