@@ -21,7 +21,10 @@ jobs:
       - name: Build package (alpha version)
         # The base version is an attribute in pyproject.toml
         # To get the incremental numbering after the "a", we use YYYYMMDDHHMM
+        # The `cd ..` is a bit of a hack. I don't know why at this point the pwd is inside the dggstools directory
+        # and not in the root of the repository.
         run: |
+          cd ..
           python setup.py egg_info -b "a`date '+%Y%m%d%H%M'`" bdist_wheel
       - name: Retrieve version
         run: |
