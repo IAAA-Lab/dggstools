@@ -42,7 +42,7 @@ jobs:
       - name: Set alpha version tag
         #echo "VERSION_TAG=$(find dist -name '*.whl' | awk -F'-' '{ print $2 }')a`date '+%Y%m%d%H%M'`" >> $GITHUB_OUTPUT
         run: |                
-          echo "VERSION_TAG=$(find dist -name '*.whl')" >> $GITHUB_OUTPUT
+          echo "VERSION_TAG=$(find dist -name '*.whl' | awk -F'-' '{ print $2 }')" >> $GITHUB_OUTPUT
         id: version
       - uses: ncipollo/release-action@v1
         with:
