@@ -40,7 +40,6 @@ jobs:
           sed -i -r 's/version = "([0-9]+(\.[0-9]+)*)"/version = "\1a'"$DATE"'"/' pyproject.toml
           python -m build
       - name: Set alpha version tag
-        #echo "VERSION_TAG=$(find dist -name '*.whl' | awk -F'-' '{ print $2 }')a`date '+%Y%m%d%H%M'`" >> $GITHUB_OUTPUT
         run: |                
           echo "VERSION_TAG=$(find dist -name '*.whl' | awk -F'-' '{ print $2 }')" >> $GITHUB_OUTPUT
         id: version
