@@ -33,11 +33,10 @@ jobs:
           python -m pip install --upgrade wheel
           if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
       - name: Build package
-        # The version is an attribute in pyproject.toml (that must be changed after generating the stable version)
-        run: |
-        # python setup.py egg_info bdist_wheel
+        run: |        
           python -m build
       - name: Retrieve version
+        # The version is an attribute in pyproject.toml (that must be changed after generating the stable version)
         run: |
           echo "VERSION_TAG=$(find dist -name '*.whl' | awk -F'-' '{ print $2 }')" >> $GITHUB_OUTPUT
         id: version
