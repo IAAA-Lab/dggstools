@@ -5,8 +5,29 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dggstools"
-version = "0.2.0"
+version = "0.1.0"
 dynamic = ["dependencies"]
+authors = [
+  { name="Rubén Béjar", email="rbejar@unizar.es" },
+  { name="Sergio Martin-Segura", email="segura@unizar.es" },
+  { name="Francisco J. Lopez-Pellicer", email="fjlopez@unizar.es" },
+  { name="Javier Nogueras-Iso", email="jnog@unizar.es" },
+  { name="F. Javier Zarazaga-Soria", email="javy@unizar.es" },
+]
+description = "A Python library and command line tool to manipulate raster and vector GIS data in a DGGS (rHEALPix for now)."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Topic :: Scientific/Engineering"
+]
+
+[project.urls]
+Homepage = "https://github.com/IAAA-Lab/dggstools"
+Issues = "https://github.com/IAAA-Lab/dggstools/issues"
 
 [project.scripts]
 dggstools = "dggstools.__main__:app"
