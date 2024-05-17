@@ -3,7 +3,7 @@ Helper functions.
 """
 
 from collections import namedtuple
-from typing import List
+from typing import List, Any
 
 import fiona.transform
 import rasterio.crs
@@ -106,32 +106,35 @@ def get_descendant_cellids_up_to_resolution_idx(cellid: str, rhpx: RHEALPixDGGS,
         result.extend(get_descendant_cellids_at_resolution_idx(cellid, rhpx, i))
     return result
 
-def get_gdf_attrs_from_rhealpix_file(input_file_path: str) -> dict:
+
+def get_gdf_attrs_from_rhealpix_file(input_file_path: str) -> dict[str, Any]:
     result = {}
     profile = get_raster_profile(input_file_path)
 
     with rasterio.open(input_file_path) as raster:
-        n_side = int(raster.tags()["n_side"])
-        rdggs = pyproj_crs_to_rdggs(pyproj.CRS(profile["crs"]), n_side)
-        rdggs_helper = RHEALPixDGGSHelper(rdggs)
-
         result["left"], result["top"], result["right"], result["bottom"], resx, resy = (
             get_bbox_from_raster_profile(profile))
-        resolution_idx_x, _ = rdggs_helper.get_closest_resolution(abs(resx))
-        resolution_idx_y, _ = rdggs_helper.get_closest_resolution(abs(resy))  # resy is often a negative number
-        assert resolution_idx_x == resolution_idx_y, \
-            f"{input_file_path} is not a proper rhealpix file. Its cells are not squares."
+        tags = raster.tags()
+        if "n_side" in tags:
+            n_side = int(tags["n_side"])
+            rdggs = pyproj_crs_to_rdggs(pyproj.CRS(profile["crs"]), n_side)
+            rdggs_helper = RHEALPixDGGSHelper(rdggs)
+            result["rhealpixdggs"] = {"n_side": rdggs.N_side,
+                                      "north_square": rdggs.north_square,
+                                      "south_square": rdggs.south_square,
+                                      "max_areal_resolution": rdggs.max_areal_resolution,
+                                      "max_resolution": rdggs.max_resolution,
+                                      "ellipsoid": rdggs.ellipsoid}
+            resolution_idx_x, _ = rdggs_helper.get_closest_resolution(abs(resx))
+            resolution_idx_y, _ = rdggs_helper.get_closest_resolution(abs(resy))  # resy is often a negative number
+            assert resolution_idx_x == resolution_idx_y, \
+                f"{input_file_path} is not a proper rhealpix file. Its cells are not squares."
+            result["res_idx"] = resolution_idx_x
+        else:
+            result["rhealpixdggs"] = {}
+            result["res_idx"] = -1  # Using -1 to indicate that the resolution is not known
 
-        result["res_idx"] = resolution_idx_x
         result["res"] = resx
-
-        result["rhealpixdggs"] = {"n_side": rdggs.N_side,
-                                  "north_square": rdggs.north_square,
-                                  "south_square": rdggs.south_square,
-                                  "max_areal_resolution": rdggs.max_areal_resolution,
-                                  "max_resolution": rdggs.max_resolution,
-                                  "ellipsoid": rdggs.ellipsoid}
-
         result["height"] = raster.height
         result["width"] = raster.width
         result["nbands"] = raster.count

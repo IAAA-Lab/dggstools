@@ -691,6 +691,13 @@ class DataTestsSpec(unittest.TestCase):
         # At this point landsat_image_small_rhpx_321.tif and landsat_image_small_gpkg_321.tif should be equivalent
         # save from minor details (e.g. compression scheme in the GeoTIFF).
 
+    def test_gdf_metadata(self):
+        gdf_attrs = get_gdf_attrs_from_rhealpix_file(os.path.join(self.temp_dir,
+                                                     "landsat_image_small.tif"))
+        # This is not a rhealpix file, so the method should not fail, but the results
+        # must reflect this fact
+        self.assertEqual(gdf_attrs["rhealpixdggs"], {})
+        self.assertEqual(gdf_attrs["res_idx"], -1)
 
 
 if __name__ == '__main__':
