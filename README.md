@@ -10,23 +10,28 @@ a DGGS (rHEALPix for now).
 - `pip` for installing Python packages
 
 ## Install the package and the command line tool
-1. You can download the latest package released on the GitHub Repository if you want the latest, non-stable version:
-
-Get the .whl file from <https://github.com/IAAA-Lab/dggstools/releases/latest>.
-
-2. Install the package and command line tool
+1. If you want the latest stable version (which is in PyPi):
 
 ```
-pip install ./name-of-the-file-you-have-downloaded.whl
+pip install dggstools
 ```
 
-3. Now you can run dggstools in the command line:
+2. If you prefer the latest non-stable version, you can download the latest package released on the GitHub Repository:
+
+ - Get the .whl file from <https://github.com/IAAA-Lab/dggstools/releases/latest>.
+ -  Install this wheel file:
+
+ ```
+ pip install ./name-of-the-file-you-have-downloaded.whl
+ ```
+
+3. In any case, once installed you can run dggstools in the command line:
 
 ```
 dggstools --help
 ```
 
-You will see something like this:
+And you will see something like this:
 
 ```
 Usage: dggstools [OPTIONS] COMMAND [ARGS]...                                                                                                                          
