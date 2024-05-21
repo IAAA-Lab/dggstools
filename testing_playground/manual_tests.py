@@ -1,3 +1,7 @@
+"""
+This module is only used to do some dirty, local, manual tests. If you are reading this, you are in uncharted
+waters and probably just loosing your time.
+"""
 import unittest
 
 import boto3
