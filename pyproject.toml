@@ -28,6 +28,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/IAAA-Lab/dggstools"
 Issues = "https://github.com/IAAA-Lab/dggstools/issues"
+Changelog = "https://github.com/IAAA-Lab/dggstools/blob/main/changelog.md"
 
 [project.scripts]
 dggstools = "dggstools.__main__:app"
