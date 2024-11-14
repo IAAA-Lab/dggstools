@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dggstools"
-version = "0.1.1"
+version = "0.1.2"
 dynamic = ["dependencies"]
 authors = [
   { name="Rubén Béjar", email="rbejar@unizar.es" },

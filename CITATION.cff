@@ -1,11 +1,11 @@
-cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
-authors:
-- family-names: "Bejar"
-  given-names: "Ruben"
-  orcid: "https://orcid.org/0000-0001-7866-3793"
-title: "dggstools"
-version: v0.1.0
-doi: 10.5281/zenodo.10659071
-date-released: 2024-02-14
-url: "https://github.com/IAAA-Lab/dggstools"
+# cff-version: 1.2.0
+# message: "If you use this software, please cite it as below."
+# authors:
+# - family-names: "Bejar"
+#   given-names: "Ruben"
+#   orcid: "https://orcid.org/0000-0001-7866-3793"
+# title: "dggstools"
+# version: v0.1.0
+# doi: 10.5281/zenodo.10659071
+# date-released: 2024-02-14
+# url: "https://github.com/IAAA-Lab/dggstools"
