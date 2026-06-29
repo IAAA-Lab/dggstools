@@ -286,17 +286,16 @@ class RHEALPixDataFrameHelper:
             output_crs, output_crs, width, height,
             left=left, right=right, top=top, bottom=bottom)
 
+        # Force both resolutions (hor and vert) to be exactly the same. We do not tolerate the slightest
+        # rounding error. This may change the number of cols and rows of the resulting raster (by 1, tops)
+        # take that into account if necessary. If there are additional cells, those will have nodata.
         if transform[0] != res or transform[4] != -res:
-            # Sometimes I have to force the output resolution or it will not be exact.
-            # Forcing this, may change the width and/or height, so it is not the default choice;
-            # it should not be a big issue: there will be some additional cells with nodata, but that's all.
-            # It is not perfect, but as long as it passes the tests...
             transform, transform_width, transform_height = rasterio.warp.calculate_default_transform(
                 output_crs, output_crs, width, height,
                 left=left, right=right, top=top, bottom=bottom, resolution=(res,res))
 
         # If this is not true, the transform has not been as exact as expected
-        assert(almost_equal(transform[0], res))
+        assert(transform[0] == res and transform[4] == -res)
 
         dtype = gdf.attrs["dtypes"][0]  # First band dtype. If there are bands
         # with different dtypes, geotiff is not the right format (theoretical support, but not in practice)
@@ -414,8 +413,9 @@ class RHEALPixDataFrameHelper:
         resx = self.rdggs.cell_width(res_idx)  # in the plane; in the ellipsoid the widths at the same resolution
                                                # level are different
 
-        height = math.floor((maxy - miny) / resx) - 1 # resx must be equal to resy
-        width = math.floor((maxx - minx) / resx) - 1
+        # There used to be a -1 here (both for height and width); it does not seem right and no tests fail
+        height = math.floor((maxy - miny) / resx) # resx must be equal to resy
+        width = math.floor((maxx - minx) / resx)
 
         # Prevents a division by zero. It is possible that this should be an exception as I don't imagine
         # a situation where this would be OK, but rounding and very low resolutions could lead to this, I suppose
