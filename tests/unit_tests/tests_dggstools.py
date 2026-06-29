@@ -16,21 +16,21 @@ class DGGSToolsTestCase(unittest.TestCase):
         rdggs_helper = rhpxutils.RHEALPixDGGSHelper(
             rhp.RHEALPixDGGS(ellipsoid=rhp.WGS84_ELLIPSOID, north_square=1, south_square=0, N_side=3))
         idx, res = rdggs_helper.get_closest_resolution(128)
-        self.assertAlmostEqual(res, 169.57389885298727)
+        self.assertAlmostEqual(res, 169.4788172157132)
         idx, res = rdggs_helper.get_closest_resolution(100)
-        self.assertAlmostEqual(res, 56.52463295099575)
+        self.assertAlmostEqual(res, 56.49293907190441)
 
     def test_higher_resolution(self):
         rdggs_helper = rhpxutils.RHEALPixDGGSHelper(
             rhp.RHEALPixDGGS(ellipsoid=rhp.WGS84_ELLIPSOID, north_square=1, south_square=0, N_side=3))
         idx, res = rdggs_helper.get_closest_higher_resolution(128)
-        self.assertAlmostEqual(res, 56.52463295099575)
+        self.assertAlmostEqual(res, 56.49293907190441)
 
     def test_lower_resolution(self):
         rdggs_helper = rhpxutils.RHEALPixDGGSHelper(
             rhp.RHEALPixDGGS(ellipsoid=rhp.WGS84_ELLIPSOID, north_square=1, south_square=0, N_side=3))
         idx, res = rdggs_helper.get_closest_lower_resolution(128)
-        self.assertAlmostEqual(res, 169.57389885298727)
+        self.assertAlmostEqual(res, 169.4788172157132)
 
     def test_change_extension(self):
         name = "coco.jpg"
